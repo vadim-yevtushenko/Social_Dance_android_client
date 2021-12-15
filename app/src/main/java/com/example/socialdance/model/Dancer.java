@@ -5,34 +5,35 @@ import com.example.socialdance.model.enums.Role;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class Dancer extends AbstractBaseEntity{
 
     private String surname;
     private String sex;
-    private Date birthDay;
+    private Date birthday;
     private Role role;
+    private LoginPassword loginPassword;
 
     public Dancer() {
+        this.role = Role.DANCER;
     }
 
-    public Dancer(String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, String surname, String sex, Date birthDay, Role role) {
+    public Dancer(String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, String surname, String sex, Date birthday, Role role) {
         super(name, description, entityInfo, rating, dances);
         this.surname = surname;
         this.sex = sex;
-        this.birthDay = birthDay;
+        this.birthday = birthday;
         this.role = role;
     }
 
-    public Dancer(Integer id, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, String surname, String sex, Date birthDay, Role role) {
+    public Dancer(Integer id, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, String surname, String sex, Date birthday, Role role) {
         super(id, name, description, entityInfo, rating, dances);
         this.surname = surname;
         this.sex = sex;
-        this.birthDay = birthDay;
+        this.birthday = birthday;
         this.role = role;
     }
+
 
     public String getSurname() {
         if (surname == null){
@@ -45,13 +46,13 @@ public class Dancer extends AbstractBaseEntity{
         this.surname = surname;
     }
 
-    public Date getBirthDay() {
+    public Date getBirthday() {
 
-        return birthDay;
+        return birthday;
     }
 
-    public void setBirthDay(Date birthDay) {
-        this.birthDay = birthDay;
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
 
     public String getSex() {
@@ -70,12 +71,20 @@ public class Dancer extends AbstractBaseEntity{
         this.role = role;
     }
 
+    public LoginPassword getLoginPassword() {
+        return loginPassword;
+    }
+
+    public void setLoginPassword(LoginPassword loginPassword) {
+        this.loginPassword = loginPassword;
+    }
+
     @Override
     public String toString() {
         return "Dancer{" +
                 "surname='" + surname + '\'' +
                 ", sex='" + sex + '\'' +
-                ", birthDay=" + birthDay +
+                ", birthDay=" + birthday +
                 ", role=" + role +
                 '}' + super.toString();
     }

@@ -63,7 +63,7 @@ public class FragmentDancer extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dancer, container, false);
-        if (getArguments() != null){
+        if (getArguments() != null) {
             id = getArguments().getInt(MainActivity.KEY_ID);
         }
         activity = (MainActivity) getActivity();
@@ -99,11 +99,13 @@ public class FragmentDancer extends Fragment {
         tvDancerName.setText(dancer.getName());
         tvDancerSurname.setText(dancer.getSurname());
         tvDancerDescription.setText(dancer.getDescription());
-        if (dancer.getBirthDay() != null) {
-            tvBirthday.setText(DateTimeUtils.dateFormat.format(dancer.getBirthDay()));
+        if (dancer.getBirthday() != null) {
+            tvBirthday.setText(DateTimeUtils.dateFormat.format(dancer.getBirthday()));
         }
         tvSex.setText(dancer.getSex());
+
         tvDancerRole.setText(dancer.getRole().toString());
+
         tvPhone.setText(dancer.getEntityInfo().getPhoneNumber());
         tvEmail.setText(dancer.getEntityInfo().getEmail());
         tvAddress.setText(getStringAddress(dancer.getEntityInfo()));

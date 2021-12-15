@@ -27,4 +27,11 @@ public interface DancerApi {
 
     @DELETE("dancers/{id}")
     Call<Dancer> deleteDancer(@Path("id") Integer id);
+
+    @GET("dancers/registration/{email}")
+    Call<Integer> checkSignUpByEmail(@Path("email") String email);
+
+    @GET("dancers/identification/{email}/{password}")
+    Call<Integer> checkSignInByEmailAndPassword(@Path("email") String email, @Path("password") String password);
+
 }

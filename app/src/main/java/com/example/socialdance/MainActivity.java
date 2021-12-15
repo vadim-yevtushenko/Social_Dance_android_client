@@ -2,6 +2,7 @@ package com.example.socialdance;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -23,7 +24,8 @@ import com.example.socialdance.model.Dancer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements FragmentDancersList.DancerPassListener, FragmentEventsList.EventPassListener, FragmentSchoolsList.SchoolPassListener {
+public class MainActivity extends AppCompatActivity implements FragmentDancersList.DancerPassListener,
+        FragmentEventsList.EventPassListener, FragmentSchoolsList.SchoolPassListener, FragmentProfileSignInOrReg.ProfilePassListener {
 
     private TextView tvEvent;
     private TextView tvSchool;
@@ -41,11 +43,17 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
     private FragmentCreateSchoolOrEvent fragmentCreateSchoolOrEvent;
     private FragmentSchoolsAndEvents fragmentSchoolsAndEvents;
 
+    private SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferencesCheck;
+    private SharedPreferences.Editor editor;
+    private String PREF_REG = "reg";
+    private String PREF_CHECKER = "checker";
+
     private List<TextView> tabs;
 
     private boolean onExit;
     private boolean isEntered;
-    private Dancer dancer;
+    private int registeredDancerId;
 
     public static final String KEY_ID = "id";
 
@@ -59,6 +67,14 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
         initViews();
         addViewsToList();
         initListeners();
+        sharedPreferencesCheck = getSharedPreferences(PREF_CHECKER, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(PREF_REG, MODE_PRIVATE);
+        registeredDancerId = sharedPreferencesCheck.getInt(KEY_ID, 0);
+        if (registeredDancerId == 0){
+            isEntered = false;
+        }else {
+            isEntered = true;
+        }
 
         tvEvent.setBackgroundColor(Color.parseColor("#FF7800"));
         tvEvent.setTextColor(Color.parseColor("#FFFFFFFF"));
@@ -69,13 +85,16 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
         tvEvent.setOnClickListener(this::setEvents);
         tvSchool.setOnClickListener(this::setSchools);
         tvDancer.setOnClickListener(this::setDancers);
-        tvProfile.setOnClickListener(this::setProfile);
+        tvProfile.setOnClickListener(v -> setProfile());
     }
 
-    private void setProfile(View view) {
+    public void setProfile() {
         setColor(tvProfile);
-        if (!isEntered){
+        if (isEntered){
+            Bundle bundle = new Bundle();
+            bundle.putInt(KEY_ID, registeredDancerId);
             setFragmentProfile();
+            fragmentProfile.setArguments(bundle);
         }else {
             setFragmentProfileSignOrReg();
         }
@@ -248,11 +267,44 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
         fragmentSchool.setArguments(bundle);
     }
 
-    public Dancer getDancer() {
-        return dancer;
+    @Override
+    public void passRegDancerId(int id) {
+        registeredDancerId = id;
+        changeProfile(registeredDancerId);
+        isEntered = true;
+        setFragmentProfile();
+        Bundle bundle = new Bundle();
+        bundle.putInt(KEY_ID, id);
+        fragmentProfile.setArguments(bundle);
     }
 
-    public void setDancer(Dancer dancer) {
-        this.dancer = dancer;
+    public void changeProfile(int id){
+        editor = sharedPreferencesCheck.edit();
+        editor.putInt(KEY_ID, id);
+        editor.apply();
+    }
+
+    public boolean isOnExit() {
+        return onExit;
+    }
+
+    public void setOnExit(boolean onExit) {
+        this.onExit = onExit;
+    }
+
+    public boolean isEntered() {
+        return isEntered;
+    }
+
+    public void setEntered(boolean entered) {
+        isEntered = entered;
+    }
+
+    public int getRegisteredDancerId() {
+        return registeredDancerId;
+    }
+
+    public void setRegisteredDancerId(int registeredDancerId) {
+        this.registeredDancerId = registeredDancerId;
     }
 }

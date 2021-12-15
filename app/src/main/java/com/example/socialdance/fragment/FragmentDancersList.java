@@ -51,7 +51,6 @@ public class FragmentDancersList extends Fragment {
         View view = inflater.inflate(R.layout.fragment_dancers_list, container, false);
         initViews(view);
         downloadEvents();
-//        dancersList = DataBaseInMemory.dancersList;
 
         return view;
     }
@@ -61,7 +60,9 @@ public class FragmentDancersList extends Fragment {
             @Override
             public void onResponse(Call<List<Dancer>> call, Response<List<Dancer>> response) {
                 dancersList = response.body();
-                createRVList();
+                if (dancersList != null) {
+                    createRVList();
+                }
                 Log.d("log", "onResponse ");
             }
 

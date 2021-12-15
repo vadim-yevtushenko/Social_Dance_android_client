@@ -2,7 +2,7 @@ package com.example.socialdance.model;
 
 
 public class EntityInfo {
-    private int id;
+    private Integer id;
     private String country;
     private String city;
     private String street;
@@ -32,6 +32,10 @@ public class EntityInfo {
         this.building = building;
         this.suites = suites;
         this.phoneNumber = phoneNumber;
+        this.email = email;
+    }
+
+    public EntityInfo(String email) {
         this.email = email;
     }
 

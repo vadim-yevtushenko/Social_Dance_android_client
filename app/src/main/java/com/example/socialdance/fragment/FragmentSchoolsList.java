@@ -51,7 +51,6 @@ public class FragmentSchoolsList extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schools_list, container, false);
         initViews(view);
-//        schoolsList = DataBaseInMemory.schoolsList;
         downloadSchools();
         return view;
     }
