@@ -95,7 +95,7 @@ public class FragmentDancer extends Fragment {
     }
 
     private void fillForm() {
-
+        ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
         tvDancerName.setText(dancer.getName());
         tvDancerSurname.setText(dancer.getSurname());
         tvDancerDescription.setText(dancer.getDescription());
@@ -104,7 +104,9 @@ public class FragmentDancer extends Fragment {
         }
         tvSex.setText(dancer.getSex());
 
-        tvDancerRole.setText(dancer.getRole().toString());
+        if (dancer.getRole() != null) {
+            tvDancerRole.setText(dancer.getRole().toString());
+        }
 
         tvPhone.setText(dancer.getEntityInfo().getPhoneNumber());
         tvEmail.setText(dancer.getEntityInfo().getEmail());
@@ -121,11 +123,20 @@ public class FragmentDancer extends Fragment {
         return stringBuilder.toString();
     }
 
+    private String getCharsForAvatar(String name, String surname) {
+        String firstChar = String.valueOf(name.charAt(0)).toUpperCase();
+        if (surname == null || surname.equals("")){
+            return firstChar;
+        }
+        return firstChar + String.valueOf(surname.charAt(0)).toUpperCase();
+    }
+
     private String getStringAddress(EntityInfo entityInfo) {
         return entityInfo.getCity();
     }
 
     private void initViews(View view) {
+        ctvAvatar = view.findViewById(R.id.ctvAvatar);
         tvDancerName = view.findViewById(R.id.tvDancerName);
         tvDancerSurname = view.findViewById(R.id.tvDancerSurname);
         tvDancerDescription = view.findViewById(R.id.tvDancerDescription);

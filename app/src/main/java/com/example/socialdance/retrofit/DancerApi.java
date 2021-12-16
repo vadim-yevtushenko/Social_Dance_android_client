@@ -26,7 +26,7 @@ public interface DancerApi {
     Call<Dancer> updateDancer(@Body Dancer dancer);
 
     @DELETE("dancers/{id}")
-    Call<Dancer> deleteDancer(@Path("id") Integer id);
+    Call<Void> deleteDancer(@Path("id") Integer id);
 
     @GET("dancers/registration/{email}")
     Call<Integer> checkSignUpByEmail(@Path("email") String email);

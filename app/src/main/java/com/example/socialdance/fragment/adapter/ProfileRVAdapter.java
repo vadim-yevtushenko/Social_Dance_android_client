@@ -15,8 +15,10 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialdance.MainActivity;
@@ -32,6 +34,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.ProfileRecyclerViewHolder> {
 
@@ -62,7 +68,12 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
 
     @Override
     public void onBindViewHolder(@NonNull ProfileRVAdapter.ProfileRecyclerViewHolder holder, int position) {
+        if (dancerList.get(position) == null){
+            exitProfile();
+            return;
+        }
         this.holderGlobal = holder;
+        holder.ctvAvatar.setText(getCharsForAvatar(dancerList.get(position).getName(), dancerList.get(position).getSurname()));
         holder.spRole.setAdapter(spinnerAdapter);
         if (dancerList.size() > 0){
             holder.etName.setText(dancerList.get(position).getName());
@@ -101,10 +112,10 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             holder.rbFemale.setChecked(true);
         }
 
-        if (dancerList.get(position).getRole() == Role.DANCER) {
-            holder.spRole.setSelection(0);
-        } else {
+        if (dancerList.get(position).getRole() == Role.TEACHER) {
             holder.spRole.setSelection(1);
+        } else {
+            holder.spRole.setSelection(0);
         }
 
         setCheckBoxes(holder, position);
@@ -117,10 +128,59 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         });
 
         holder.bExit.setOnClickListener(v -> {
-            activity.setEntered(false);
-            activity.changeProfile(0);
-            activity.setProfile();
+            exitProfile();
         });
+
+        holder.bDelete.setOnClickListener(v -> {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity).
+                    setTitle("Your profile will be deleted!").
+                    setMessage("Do you want delete your profile?").
+                    setPositiveButton("YES", (dialog, which) -> {
+                        deleteDancer(dancerList.get(position).getId());
+                    }).
+                    setNeutralButton("CANCEL", (dialog, which) -> {
+                    });
+            alertDialog.show();
+
+        });
+
+        holder.bCreate.setOnClickListener(v -> {
+            activity.setFragmentCreateSchoolOrEvent();
+        });
+        holder.bSchoolAndEvents.setOnClickListener(v -> {
+
+        });
+    }
+
+    public void deleteDancer(int id){
+        fragmentProfile.getDancerApi().deleteDancer(id).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                response.body();
+                exitProfile();
+                Toast.makeText(activity, "DELETED", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG).show();
+                Log.d("log", "onFailure " + t.toString());
+            }
+        });
+    }
+
+    public void exitProfile(){
+        activity.setEntered(false);
+        activity.changeProfile(0);
+        activity.setProfile();
+    }
+
+    private String getCharsForAvatar(String name, String surname) {
+        String firstChar = String.valueOf(name.charAt(0)).toUpperCase();
+        if (surname == null || surname.equals("")){
+            return firstChar;
+        }
+        return firstChar + String.valueOf(surname.charAt(0)).toUpperCase();
     }
 
     private void setCheckBoxes(ProfileRecyclerViewHolder holder, int position) {

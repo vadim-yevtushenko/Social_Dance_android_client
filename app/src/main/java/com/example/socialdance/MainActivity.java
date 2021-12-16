@@ -100,6 +100,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
         }
     }
 
+
+
     private void setDancers(View view) {
         setColor(tvDancer);
         setFragmentDancersList();
@@ -210,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
     }
 
     public void setFragmentCreateSchoolOrEvent() {
-        onExit = true;
+        onExit = false;
         fragmentCreateSchoolOrEvent = new FragmentCreateSchoolOrEvent();
         getSupportFragmentManager()
                 .beginTransaction()
@@ -219,7 +221,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
     }
 
     public void setFragmentSchoolsAndEvents() {
-        onExit = true;
+        onExit = false;
         fragmentSchoolsAndEvents = new FragmentSchoolsAndEvents();
         getSupportFragmentManager()
                 .beginTransaction()

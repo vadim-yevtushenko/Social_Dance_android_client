@@ -71,16 +71,15 @@ public class FragmentProfile extends Fragment {
             @Override
             public void onResponse(Call<Dancer> call, Response<Dancer> response) {
                 dancer = response.body();
-                if (dancer != null) {
-                    dancerList.add(dancer);
-                }
+                dancerList.add(dancer);
                 Log.d("log", "downloadDancer onResponse " + dancerList);
                 createProfileRecyclerView();
             }
 
             @Override
             public void onFailure(Call<Dancer> call, Throwable t) {
-
+                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
+                Log.d("log", "onFailure " + t.toString());
             }
         });
     }
@@ -98,7 +97,8 @@ public class FragmentProfile extends Fragment {
                 }else {
                     downloadDancer();
                 }
-//                profileRVAdapter.notifyDataSetChanged();
+                profileRVAdapter.notifyDataSetChanged();
+                Toast.makeText(getActivity(), "SAVED", Toast.LENGTH_LONG).show();
             }
 
             @Override
@@ -108,6 +108,8 @@ public class FragmentProfile extends Fragment {
             }
         });
     }
+
+
 
     private void createDancerForSave() {
 
@@ -176,5 +178,7 @@ public class FragmentProfile extends Fragment {
         return dancer;
     }
 
-
+    public DancerApi getDancerApi() {
+        return dancerApi;
+    }
 }

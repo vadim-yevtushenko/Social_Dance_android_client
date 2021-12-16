@@ -41,7 +41,7 @@ public class DancerRVAdapter extends RecyclerView.Adapter<DancerRVAdapter.Dancer
     @Override
     public void onBindViewHolder(@NonNull DancerRVAdapter.DancerRecyclerViewHolder holder, int position) {
 
-        holder.ctvAvatar.setText(getChars(dancers.get(position).getName(), dancers.get(position).getSurname()));
+        holder.ctvAvatar.setText(getCharsForAvatar(dancers.get(position).getName(), dancers.get(position).getSurname()));
         holder.tvName.setText(dancers.get(position).getName());
         holder.tvSurname.setText(dancers.get(position).getSurname());
         holder.tvDancerCity.setText(dancers.get(position).getEntityInfo().getCity());
@@ -50,7 +50,7 @@ public class DancerRVAdapter extends RecyclerView.Adapter<DancerRVAdapter.Dancer
         });
     }
 
-    private String getChars(String name, String surname) {
+    private String getCharsForAvatar(String name, String surname) {
         String firstChar = String.valueOf(name.charAt(0)).toUpperCase();
         if (surname == null || surname.equals("")){
             return firstChar;
