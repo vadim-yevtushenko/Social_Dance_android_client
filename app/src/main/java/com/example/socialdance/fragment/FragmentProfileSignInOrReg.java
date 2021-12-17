@@ -38,7 +38,7 @@ public class FragmentProfileSignInOrReg extends Fragment {
 
     private DancerApi dancerApi;
 
-    private ProfilePassListener profilePassListener;
+    private ProfileSignInOrRegPassListener profileSignInOrRegPassListener;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -51,7 +51,7 @@ public class FragmentProfileSignInOrReg extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile_sign_in_or_reg, container, false);
-        profilePassListener = (ProfilePassListener) getContext();
+        profileSignInOrRegPassListener = (ProfileSignInOrRegPassListener) getContext();
         initViews(view);
         bSignIn.setOnClickListener(this::signIn);
         bSignUp.setOnClickListener(this::signUp);
@@ -92,7 +92,7 @@ public class FragmentProfileSignInOrReg extends Fragment {
                 Dancer regDancer = response.body();
                 Log.d("log", "registrationDancerOnServer onResponse " + regDancer);
                 if (regDancer != null) {
-                    profilePassListener.passRegDancerId(regDancer.getId());
+                    profileSignInOrRegPassListener.passRegDancerId(regDancer.getId());
                 }
             }
 
@@ -120,7 +120,7 @@ public class FragmentProfileSignInOrReg extends Fragment {
                     public void onResponse(Call<Integer> call, Response<Integer> response) {
                         Integer check = response.body();
                         if (check != null && check > 0){
-                            profilePassListener.passRegDancerId(check);
+                            profileSignInOrRegPassListener.passRegDancerId(check);
                         }else {
                             Toast.makeText(getActivity(), "wrong login or password", Toast.LENGTH_LONG).show();
                         }
@@ -144,7 +144,7 @@ public class FragmentProfileSignInOrReg extends Fragment {
         bSignUp = view.findViewById(R.id.bSignUp);
     }
 
-    public interface ProfilePassListener{
+    public interface ProfileSignInOrRegPassListener {
         void passRegDancerId(int id);
     }
 }

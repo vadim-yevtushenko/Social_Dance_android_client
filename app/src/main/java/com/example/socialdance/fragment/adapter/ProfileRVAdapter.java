@@ -58,7 +58,6 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
     public ProfileRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
         activity = (MainActivity) parent.getContext();
-        Log.d("log", "onCreateViewHolder " + dancerList);
         spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Role.values());
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.profile_item, parent, false);
@@ -68,19 +67,16 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
 
     @Override
     public void onBindViewHolder(@NonNull ProfileRVAdapter.ProfileRecyclerViewHolder holder, int position) {
-        if (dancerList.get(position) == null){
-            exitProfile();
-            return;
-        }
+        Dancer dancer = dancerList.get(position);
         this.holderGlobal = holder;
-        holder.ctvAvatar.setText(getCharsForAvatar(dancerList.get(position).getName(), dancerList.get(position).getSurname()));
+        holder.ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
         holder.spRole.setAdapter(spinnerAdapter);
         if (dancerList.size() > 0){
-            holder.etName.setText(dancerList.get(position).getName());
-            holder.etSurname.setText(dancerList.get(position).getSurname());
-            holder.etDescription.setText(dancerList.get(position).getDescription());
-            if (dancerList.get(position).getBirthday() != null) {
-                holder.tvBirthdayShow.setText(DateTimeUtils.dateFormat.format(dancerList.get(position).getBirthday()));
+            holder.etName.setText(dancer.getName());
+            holder.etSurname.setText(dancer.getSurname());
+            holder.etDescription.setText(dancer.getDescription());
+            if (dancer.getBirthday() != null) {
+                holder.tvBirthdayShow.setText(DateTimeUtils.dateFormat.format(dancer.getBirthday()));
             } else {
                 holder.tvBirthdayShow.setText("");
             }
@@ -92,7 +88,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
                     context,
                     (DatePickerDialog.OnDateSetListener) (view1, year, month, dayOfMonth) -> {
                         holder.tvBirthdayShow.setText(dayOfMonth + "." + (month + 1) + "." + year);
-                        dancerList.get(0).setBirthday(new GregorianCalendar(year, month, dayOfMonth).getTime());
+                        dancer.setBirthday(new GregorianCalendar(year, month, dayOfMonth).getTime());
                     },
                     calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH),
@@ -103,16 +99,16 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             datePickerDialog.show();
         });
 
-        holder.etCity.setText(dancerList.get(position).getEntityInfo().getCity());
-        holder.etPhone.setText(dancerList.get(position).getEntityInfo().getPhoneNumber());
-        holder.etEmail.setText(dancerList.get(position).getEntityInfo().getEmail());
-        if (dancerList.get(position).getSex() == null || dancerList.get(position).getSex().equals("male")){
+        holder.etCity.setText(dancer.getEntityInfo().getCity());
+        holder.etPhone.setText(dancer.getEntityInfo().getPhoneNumber());
+        holder.etEmail.setText(dancer.getEntityInfo().getEmail());
+        if (dancer.getSex() == null || dancer.getSex().equals("male")){
             holder.rbMale.setChecked(true);
         }else {
             holder.rbFemale.setChecked(true);
         }
 
-        if (dancerList.get(position).getRole() == Role.TEACHER) {
+        if (dancer.getRole() == Role.TEACHER) {
             holder.spRole.setSelection(1);
         } else {
             holder.spRole.setSelection(0);
@@ -128,7 +124,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         });
 
         holder.bExit.setOnClickListener(v -> {
-            exitProfile();
+            fragmentProfile.exitProfile();
         });
 
         holder.bDelete.setOnClickListener(v -> {
@@ -136,7 +132,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
                     setTitle("Your profile will be deleted!").
                     setMessage("Do you want delete your profile?").
                     setPositiveButton("YES", (dialog, which) -> {
-                        deleteDancer(dancerList.get(position).getId());
+                        deleteDancer(dancer.getId());
                     }).
                     setNeutralButton("CANCEL", (dialog, which) -> {
                     });
@@ -145,10 +141,14 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         });
 
         holder.bCreate.setOnClickListener(v -> {
-            activity.setFragmentCreateSchoolOrEvent();
+            if (dancer.getRole() != null) {
+                activity.setFragmentCreateSchoolOrEvent();
+            } else {
+                Toast.makeText(activity, "save your ROLE, please", Toast.LENGTH_LONG).show();
+            }
         });
         holder.bSchoolAndEvents.setOnClickListener(v -> {
-
+            activity.setFragmentSchoolsAndEvents();
         });
     }
 
@@ -157,7 +157,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 response.body();
-                exitProfile();
+                fragmentProfile.exitProfile();
                 Toast.makeText(activity, "DELETED", Toast.LENGTH_LONG).show();
             }
 
@@ -169,11 +169,6 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         });
     }
 
-    public void exitProfile(){
-        activity.setEntered(false);
-        activity.changeProfile(0);
-        activity.setProfile();
-    }
 
     private String getCharsForAvatar(String name, String surname) {
         String firstChar = String.valueOf(name.charAt(0)).toUpperCase();
@@ -261,7 +256,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             etCity = itemView.findViewById(R.id.etCity);
             etPhone = itemView.findViewById(R.id.etPhone);
             etEmail = itemView.findViewById(R.id.etEmail);
-            bCreate = itemView.findViewById(R.id.bCreate);
+            bCreate = itemView.findViewById(R.id.bDelete);
             bDelete = itemView.findViewById(R.id.bDelete);
             bExit = itemView.findViewById(R.id.bExit);
             bSchoolAndEvents = itemView.findViewById(R.id.bSchoolAndEvents);

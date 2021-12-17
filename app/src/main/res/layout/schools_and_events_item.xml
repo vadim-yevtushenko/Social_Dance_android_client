@@ -49,7 +49,7 @@
         android:layout_height="35dp"
         android:layout_marginTop="36dp"
         android:gravity="center"
-        android:text="TextView"
+        android:text="Date to"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.672"
         app:layout_constraintStart_toStartOf="parent"
@@ -206,7 +206,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/bCreate"
+        android:id="@+id/bDelete"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="684dp"
@@ -219,17 +219,17 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.049"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.025"
-        app:srcCompat="@drawable/ic_launcher_foreground" />
+<!--    <ImageView-->
+<!--        android:id="@+id/imageView"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.049"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.025"-->
+<!--        app:srcCompat="@drawable/ic_launcher_foreground" />-->
 
     <Button
         android:id="@+id/bSave"
@@ -278,7 +278,7 @@
         android:layout_width="150dp"
         android:layout_height="35dp"
         android:ems="10"
-        android:hint="Name"
+        android:hint="City"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

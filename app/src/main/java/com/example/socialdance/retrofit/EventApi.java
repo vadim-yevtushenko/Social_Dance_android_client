@@ -16,6 +16,9 @@ public interface EventApi {
     @GET("events")
     Call<List<Event>> getAllEvents();
 
+    @GET("events/owner/{id}")
+    Call<List<Event>> getAllEventsByOwnerId(@Path("id") int id);
+
     @GET("events/{id}")
     Call<Event> getEventById(@Path("id") Integer id);
 
@@ -26,5 +29,5 @@ public interface EventApi {
     Call<Event> updateEvent(@Body Event event);
 
     @DELETE("events/{id}")
-    Call<Event> deleteEvent(@Path("id") Integer id);
+    Call<Void> deleteEvent(@Path("id") Integer id);
 }

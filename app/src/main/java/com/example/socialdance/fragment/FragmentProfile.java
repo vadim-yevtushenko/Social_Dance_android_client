@@ -44,6 +44,7 @@ public class FragmentProfile extends Fragment {
     private Dancer dancer;
     private int id;
 
+    private MainActivity activity;
     private DancerApi dancerApi;
 
     @Override
@@ -56,6 +57,7 @@ public class FragmentProfile extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        activity = (MainActivity) getActivity();
         initViews(view);
         if (getArguments() != null){
             id = getArguments().getInt(MainActivity.KEY_ID);
@@ -71,8 +73,12 @@ public class FragmentProfile extends Fragment {
             @Override
             public void onResponse(Call<Dancer> call, Response<Dancer> response) {
                 dancer = response.body();
+                if (dancer.getId() == null){
+                    exitProfile();
+                    return;
+                }
                 dancerList.add(dancer);
-                Log.d("log", "downloadDancer onResponse " + dancerList);
+                Log.d("log", "downloadDancer onResponse ");
                 createProfileRecyclerView();
             }
 
@@ -82,6 +88,12 @@ public class FragmentProfile extends Fragment {
                 Log.d("log", "onFailure " + t.toString());
             }
         });
+    }
+
+    public void exitProfile(){
+        activity.setEntered(false);
+        activity.changeProfile(0);
+        activity.setProfile();
     }
 
     private void save(View view) {
@@ -181,4 +193,5 @@ public class FragmentProfile extends Fragment {
     public DancerApi getDancerApi() {
         return dancerApi;
     }
+
 }

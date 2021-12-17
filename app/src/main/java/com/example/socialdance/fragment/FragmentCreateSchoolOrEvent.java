@@ -112,8 +112,10 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
     private void create(View view) {
         if (spRole.getSelectedItem().equals(EVENT)){
             createEvent();
+//            Toast.makeText(activity, "Event saved successfully", Toast.LENGTH_LONG).show();
         }else if (spRole.getSelectedItem().equals(SCHOOL)){
             createSchool();
+//            Toast.makeText(activity, "School saved successfully", Toast.LENGTH_LONG).show();
         }
 
     }
@@ -127,8 +129,13 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
         schoolApi.createSchool(school).enqueue(new Callback<School>() {
             @Override
             public void onResponse(Call<School> call, Response<School> response) {
+                School newSchool = response.body();
 
-                Toast.makeText(activity, "School created", Toast.LENGTH_LONG).show();
+                if (newSchool != null) {
+                    Toast.makeText(activity, "School saved successfully", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(activity, "School not saved", Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
@@ -144,7 +151,7 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
         school.setOwnerId(activity.getRegisteredDancerId());
         EntityInfo entityInfo = new EntityInfo(etCountry.getText().toString(), etCity.getText().toString(),
                 etStreet.getText().toString(), etBuilding.getText().toString(),etSuite.getText().toString(),
-                etPhone.getText().toString(), etEmail.getText().toString());
+                etPhone.getText().toString(), null);
         school.setName(etName.getText().toString());
         school.setDescription(etDescription.getText().toString());
         school.setEntityInfo(entityInfo);
@@ -186,10 +193,18 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
             Toast.makeText(activity, "Enter the date event", Toast.LENGTH_LONG).show();
             return;
         }
+        Log.d("log", "createEvent " + event);
         eventApi.createEvent(event).enqueue(new Callback<Event>() {
             @Override
             public void onResponse(Call<Event> call, Response<Event> response) {
-                Toast.makeText(activity, "Event created", Toast.LENGTH_LONG).show();
+                Event newEvent = response.body();
+                Log.d("log", "onResponse " + newEvent);
+
+                if (newEvent != null) {
+                    Toast.makeText(activity, "Event saved successfully", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(activity, "Event not saved", Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
@@ -202,9 +217,10 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
 
     private Event prepareEventForCreate() {
         Event event = new Event();
+        event.setOwnerId(activity.getRegisteredDancerId());
         EntityInfo entityInfo = new EntityInfo(etCountry.getText().toString(), etCity.getText().toString(),
                 etStreet.getText().toString(), etBuilding.getText().toString(),etSuite.getText().toString(),
-                etPhone.getText().toString(), etEmail.getText().toString());
+                etPhone.getText().toString(), null);
         event.setName(etName.getText().toString());
         event.setDescription(etDescription.getText().toString());
         event.setEntityInfo(entityInfo);
@@ -298,7 +314,6 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
 
     private void initViews(View view) {
         etName = view.findViewById(R.id.etName);
-        etPhone = view.findViewById(R.id.etPhone);
         etDescription = view.findViewById(R.id.etDescription);
         tvDateShow = view.findViewById(R.id.tvDateShow);
         bDate = view.findViewById(R.id.bDate);
@@ -307,7 +322,8 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
         etStreet = view.findViewById(R.id.etStreet);
         etBuilding = view.findViewById(R.id.etBuilding);
         etSuite = view.findViewById(R.id.etSuite);
-        etEmail = view.findViewById(R.id.etEmail);
+        etPhone = view.findViewById(R.id.etPhone);
+//        etEmail = view.findViewById(R.id.etEmail);
         ivSave = view.findViewById(R.id.ivSave);
         ivBack = view.findViewById(R.id.ivBack);
 //        ivAvatar = view.findViewById(R.id.ivAvatar);

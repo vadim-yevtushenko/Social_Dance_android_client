@@ -19,13 +19,13 @@ import com.example.socialdance.fragment.FragmentProfileSignInOrReg;
 import com.example.socialdance.fragment.FragmentSchool;
 import com.example.socialdance.fragment.FragmentSchoolsAndEvents;
 import com.example.socialdance.fragment.FragmentSchoolsList;
-import com.example.socialdance.model.Dancer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements FragmentDancersList.DancerPassListener,
-        FragmentEventsList.EventPassListener, FragmentSchoolsList.SchoolPassListener, FragmentProfileSignInOrReg.ProfilePassListener {
+        FragmentEventsList.EventPassListener, FragmentSchoolsList.SchoolPassListener,
+        FragmentProfileSignInOrReg.ProfileSignInOrRegPassListener {
 
     private TextView tvEvent;
     private TextView tvSchool;

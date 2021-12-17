@@ -16,6 +16,9 @@ public interface SchoolApi {
     @GET("schools")
     Call<List<School>> getAllSchools();
 
+    @GET("schools/owner/{id}")
+    Call<List<School>> getAllSchoolsByOwnerId(@Path("id")int id);
+
     @GET("schools/{id}")
     Call<School> getSchoolById(@Path("id") Integer id);
 
@@ -26,5 +29,5 @@ public interface SchoolApi {
     Call<School> updateSchool(@Body School school);
 
     @DELETE("schools/{id}")
-    Call<School> deleteSchool(@Path("id") Integer id);
+    Call<Void> deleteSchool(@Path("id") Integer id);
 }
