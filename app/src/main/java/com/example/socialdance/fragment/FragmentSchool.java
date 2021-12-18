@@ -34,8 +34,9 @@ public class FragmentSchool extends Fragment {
 
     private int id;
     private MainActivity activity;
-    private ImageView ivBack;
+    private SchoolForReviewPassListener passListener;
 
+    private ImageView ivBack;
     private TextView tvSchoolName;
     private TextView tvSchoolDescription;
     private TextView tvSchoolAddress;
@@ -62,10 +63,16 @@ public class FragmentSchool extends Fragment {
             id = getArguments().getInt(MainActivity.KEY_ID);
         }
         activity = (MainActivity) getActivity();
+        passListener = activity;
         initViews(view);
         downloadSchool();
+        bReviews.setOnClickListener(this::reviews);
         ivBack.setOnClickListener(this::back);
         return view;
+    }
+
+    private void reviews(View view) {
+        passListener.passSchoolFroReviewId(id);
     }
 
     private void downloadSchool() {
@@ -136,5 +143,9 @@ public class FragmentSchool extends Fragment {
         tvOwner = view.findViewById(R.id.tvOwner);
         bReviews = view.findViewById(R.id.bReviews);
 
+    }
+
+    public interface SchoolForReviewPassListener{
+        void passSchoolFroReviewId(int id);
     }
 }

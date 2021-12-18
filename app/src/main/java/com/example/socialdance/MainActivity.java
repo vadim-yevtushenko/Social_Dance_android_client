@@ -16,6 +16,7 @@ import com.example.socialdance.fragment.FragmentEvent;
 import com.example.socialdance.fragment.FragmentEventsList;
 import com.example.socialdance.fragment.FragmentProfile;
 import com.example.socialdance.fragment.FragmentProfileSignInOrReg;
+import com.example.socialdance.fragment.FragmentReviewsAndRating;
 import com.example.socialdance.fragment.FragmentSchool;
 import com.example.socialdance.fragment.FragmentSchoolsAndEvents;
 import com.example.socialdance.fragment.FragmentSchoolsList;
@@ -25,7 +26,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements FragmentDancersList.DancerPassListener,
         FragmentEventsList.EventPassListener, FragmentSchoolsList.SchoolPassListener,
-        FragmentProfileSignInOrReg.ProfileSignInOrRegPassListener {
+        FragmentProfileSignInOrReg.ProfileSignInOrRegPassListener, FragmentSchool.SchoolForReviewPassListener {
 
     private TextView tvEvent;
     private TextView tvSchool;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
     private FragmentProfileSignInOrReg fragmentProfileSignInOrReg;
     private FragmentCreateSchoolOrEvent fragmentCreateSchoolOrEvent;
     private FragmentSchoolsAndEvents fragmentSchoolsAndEvents;
+    private FragmentReviewsAndRating fragmentReviewsAndRating;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences sharedPreferencesCheck;
@@ -229,6 +231,15 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
                 .commit();
     }
 
+    private void setFragmentReviewsAndRating() {
+        onExit = false;
+        fragmentReviewsAndRating = new FragmentReviewsAndRating();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.frameLayout, fragmentReviewsAndRating)
+                .commit();
+    }
+
     private void initViews() {
         tvEvent = findViewById(R.id.tvEvents);
         tvSchool = findViewById(R.id.tvSchools);
@@ -280,6 +291,16 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
         fragmentProfile.setArguments(bundle);
     }
 
+    @Override
+    public void passSchoolFroReviewId(int id) {
+        setFragmentReviewsAndRating();
+        Bundle bundle = new Bundle();
+        bundle.putInt(KEY_ID, id);
+        fragmentReviewsAndRating.setArguments(bundle);
+    }
+
+
+
     public void changeProfile(int id){
         editor = sharedPreferencesCheck.edit();
         editor.putInt(KEY_ID, id);
@@ -309,4 +330,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
     public void setRegisteredDancerId(int registeredDancerId) {
         this.registeredDancerId = registeredDancerId;
     }
+
+
 }

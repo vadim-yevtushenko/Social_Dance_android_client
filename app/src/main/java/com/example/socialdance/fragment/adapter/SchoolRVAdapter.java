@@ -17,7 +17,6 @@ import com.example.socialdance.fragment.FragmentSchoolsList;
 import java.util.List;
 
 public class SchoolRVAdapter extends RecyclerView.Adapter<SchoolRVAdapter.SchoolRecyclerVieHolder> {
-    private Context context;
     private List<School> schools;
     private FragmentSchoolsList.SchoolPassListener passListener;
 
@@ -28,11 +27,11 @@ public class SchoolRVAdapter extends RecyclerView.Adapter<SchoolRVAdapter.School
     @NonNull
     @Override
     public SchoolRVAdapter.SchoolRecyclerVieHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
+        Context context = parent.getContext();
         passListener = (FragmentSchoolsList.SchoolPassListener) context;
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.school_item, parent, false);
-        SchoolRVAdapter.SchoolRecyclerVieHolder vieHolder = new SchoolRVAdapter.SchoolRecyclerVieHolder(view);
+        SchoolRecyclerVieHolder vieHolder = new SchoolRecyclerVieHolder(view);
         return vieHolder;
     }
 

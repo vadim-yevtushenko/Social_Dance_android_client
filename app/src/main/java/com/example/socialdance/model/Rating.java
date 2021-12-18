@@ -5,18 +5,18 @@ public class Rating {
 
     private int id;
 
-    private AbstractBaseEntity abstractBaseEntity;
+    private int entityId;
 
-    private int reviewer_id;
+    private int reviewerId;
 
     private int rating;
 
     public Rating() {
     }
 
-    public Rating(AbstractBaseEntity abstractBaseEntity, int reviewer_id, int rating) {
-        this.abstractBaseEntity = abstractBaseEntity;
-        this.reviewer_id = reviewer_id;
+    public Rating(int entityId, int reviewerId, int rating) {
+        this.entityId = entityId;
+        this.reviewerId = reviewerId;
         this.rating = rating;
     }
 
@@ -28,12 +28,12 @@ public class Rating {
         this.id = id;
     }
 
-    public AbstractBaseEntity getAbstractBaseEntity() {
-        return abstractBaseEntity;
+    public int getEntityId() {
+        return entityId;
     }
 
-    public void setAbstractBaseEntity(AbstractBaseEntity abstractBaseEntity) {
-        this.abstractBaseEntity = abstractBaseEntity;
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
     }
 
     public int getRating() {
@@ -44,20 +44,20 @@ public class Rating {
         this.rating = rating;
     }
 
-    public int getReviewer_id() {
-        return reviewer_id;
+    public int getReviewerId() {
+        return reviewerId;
     }
 
-    public void setReviewer_id(int reviewer) {
-        this.reviewer_id = reviewer;
+    public void setReviewerId(int reviewer) {
+        this.reviewerId = reviewer;
     }
 
     @Override
     public String toString() {
         return "Rating{" +
                 "id=" + id +
-                ", abstractBaseEntity=" + abstractBaseEntity.getId() +
-                ", reviewer=" + reviewer_id +
+                ", abstractBaseEntity=" + entityId +
+                ", reviewer=" + reviewerId +
                 ", rating=" + rating +
                 '}';
     }
