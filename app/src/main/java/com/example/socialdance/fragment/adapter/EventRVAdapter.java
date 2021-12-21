@@ -1,6 +1,7 @@
 package com.example.socialdance.fragment.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,7 @@ public class EventRVAdapter extends RecyclerView.Adapter<EventRVAdapter.EventRec
 
     @Override
     public void onBindViewHolder(@NonNull EventRVAdapter.EventRecyclerVieHolder holder, int position) {
+
         holder.tvName.setText(events.get(position).getName());
         holder.tvDescription.setText(events.get(position).getDescription());
         holder.tvDatePublication.setText(DateTimeUtils.dateTimeFormat.format(events.get(position).getDatePublication()));

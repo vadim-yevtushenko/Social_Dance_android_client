@@ -64,6 +64,7 @@ public class FragmentProfile extends Fragment {
         }
         dancerList = new ArrayList<>();
         downloadDancer();
+        createProfileRecyclerView();
         ivSave.setOnClickListener(this::save);
         return view;
     }
@@ -79,7 +80,7 @@ public class FragmentProfile extends Fragment {
                 }
                 dancerList.add(dancer);
                 Log.d("log", "downloadDancer onResponse ");
-                createProfileRecyclerView();
+                profileRVAdapter.notifyDataSetChanged();
             }
 
             @Override

@@ -116,16 +116,16 @@ public class FragmentSchool extends Fragment {
     private String getStringAddress(EntityInfo entityInfo) {
         StringBuilder stringBuilder = new StringBuilder();
         if (entityInfo.getCountry() != null){
-            stringBuilder.append(entityInfo.getCountry()).append(", ");
+            stringBuilder.append(entityInfo.getCountry()).append("  ");
         }
         if (entityInfo.getCity() != null){
-            stringBuilder.append(entityInfo.getCity()).append(", ");
+            stringBuilder.append(entityInfo.getCity()).append("  ");
         }
         if (entityInfo.getStreet() != null){
-            stringBuilder.append(entityInfo.getStreet()).append(", ");
+            stringBuilder.append(entityInfo.getStreet()).append(" ");
         }
         if (entityInfo.getBuilding() != null){
-            stringBuilder.append(entityInfo.getBuilding()).append(", ");
+            stringBuilder.append(entityInfo.getBuilding()).append("  ");
         }
         if (entityInfo.getSuites() != null){
             stringBuilder.append(entityInfo.getSuites());

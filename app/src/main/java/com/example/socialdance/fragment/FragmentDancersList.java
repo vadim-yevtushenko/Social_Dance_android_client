@@ -23,6 +23,7 @@ import com.example.socialdance.repository.DataBaseInMemory;
 import com.example.socialdance.retrofit.DancerApi;
 import com.example.socialdance.retrofit.NetworkService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -50,6 +51,8 @@ public class FragmentDancersList extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dancers_list, container, false);
         initViews(view);
+        dancersList = new ArrayList<>();
+        createRVList();
         downloadEvents();
 
         return view;
@@ -59,10 +62,10 @@ public class FragmentDancersList extends Fragment {
         dancerApi.getAllDancers().enqueue(new Callback<List<Dancer>>() {
             @Override
             public void onResponse(Call<List<Dancer>> call, Response<List<Dancer>> response) {
-                dancersList = response.body();
-                if (dancersList != null) {
-                    createRVList();
-                }
+                dancersList.addAll(response.body());
+
+                adapter.notifyDataSetChanged();
+
                 Log.d("log", "onResponse ");
             }
 
@@ -87,7 +90,7 @@ public class FragmentDancersList extends Fragment {
         rvDancersList = view.findViewById(R.id.rvDancersList);
     }
 
-    public interface DancerPassListener{
+    public interface DancerPassListener {
         void passDancerId(int id);
     }
 }

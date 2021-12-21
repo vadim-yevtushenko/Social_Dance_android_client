@@ -13,6 +13,7 @@ import com.example.socialdance.R;
 import com.example.socialdance.model.Review;
 import com.example.socialdance.retrofit.DancerApi;
 import com.example.socialdance.retrofit.NetworkService;
+import com.example.socialdance.utils.DateTimeUtils;
 
 import java.util.List;
 
@@ -38,9 +39,9 @@ public class ReviewRVAdapter extends RecyclerView.Adapter<ReviewRVAdapter.Review
 
     @Override
     public void onBindViewHolder(@NonNull ReviewRVAdapter.ReviewRecyclerViewHolder holder, int position) {
-        holder.tvReview.setText("");
-        holder.tvDateReview.setText("");
-        holder.tvName.setText("");
+        holder.tvReview.setText(reviewList.get(position).getReview());
+        holder.tvDateReview.setText(DateTimeUtils.dateTimeFormat.format(reviewList.get(position).getDateTime()));
+        holder.tvName.setText(String.valueOf(reviewList.get(position).getAbstractBaseEntityId()));
     }
 
     @Override

@@ -115,19 +115,19 @@ public class FragmentEvent extends Fragment {
 
     private String getStringAddress(EntityInfo entityInfo) {
         StringBuilder stringBuilder = new StringBuilder();
-        if (entityInfo.getCountry() != null){
-            stringBuilder.append(entityInfo.getCountry()).append(", ");
+        if (entityInfo.getCountry() != null || !entityInfo.getCountry().equals("")){
+            stringBuilder.append(entityInfo.getCountry()).append("  ");
         }
-        if (entityInfo.getCity() != null){
-            stringBuilder.append(entityInfo.getCity()).append(", ");
+        if (entityInfo.getCity() != null || !entityInfo.getCity().equals("")){
+            stringBuilder.append(entityInfo.getCity()).append("  ");
         }
-        if (entityInfo.getStreet() != null){
-            stringBuilder.append(entityInfo.getStreet()).append(", ");
+        if (entityInfo.getStreet() != null || !entityInfo.getStreet().equals("")){
+            stringBuilder.append(entityInfo.getStreet()).append(" ");
         }
-        if (entityInfo.getBuilding() != null){
-            stringBuilder.append(entityInfo.getBuilding()).append(", ");
+        if (entityInfo.getBuilding() != null || !entityInfo.getBuilding().equals("")){
+            stringBuilder.append(entityInfo.getBuilding()).append("  ");
         }
-        if (entityInfo.getSuites() != null){
+        if (entityInfo.getSuites() != null || !entityInfo.getSuites().equals("")){
             stringBuilder.append(entityInfo.getSuites());
         }
         return stringBuilder.toString();

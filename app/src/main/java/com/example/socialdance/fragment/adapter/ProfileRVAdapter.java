@@ -147,6 +147,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
                 Toast.makeText(activity, "save your ROLE, please", Toast.LENGTH_LONG).show();
             }
         });
+
         holder.bSchoolAndEvents.setOnClickListener(v -> {
             activity.setFragmentSchoolsAndEvents();
         });
@@ -256,7 +257,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             etCity = itemView.findViewById(R.id.etCity);
             etPhone = itemView.findViewById(R.id.etPhone);
             etEmail = itemView.findViewById(R.id.etEmail);
-            bCreate = itemView.findViewById(R.id.bDelete);
+            bCreate = itemView.findViewById(R.id.bCreate);
             bDelete = itemView.findViewById(R.id.bDelete);
             bExit = itemView.findViewById(R.id.bExit);
             bSchoolAndEvents = itemView.findViewById(R.id.bSchoolAndEvents);

@@ -55,6 +55,7 @@ public class FragmentEventsList extends Fragment {
         activity = (MainActivity) getActivity();
         initViews(view);
         eventsList = new ArrayList<>();
+        createRVList();
         downloadEvents();
 
         return view;
@@ -64,8 +65,9 @@ public class FragmentEventsList extends Fragment {
         eventApi.getAllEvents().enqueue(new Callback<List<Event>>() {
             @Override
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
-                eventsList = response.body();
-                createRVList();
+                eventsList.addAll(response.body());
+                adapter.notifyDataSetChanged();
+
                 Log.d("log", "onResponse ");
             }
 
@@ -90,7 +92,7 @@ public class FragmentEventsList extends Fragment {
         rvEventsList = view.findViewById(R.id.rvEventsList);
     }
 
-    public interface EventPassListener{
+    public interface EventPassListener {
         void passEventId(int id);
     }
 }

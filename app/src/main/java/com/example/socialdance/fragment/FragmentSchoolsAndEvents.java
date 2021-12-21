@@ -62,7 +62,9 @@ public class FragmentSchoolsAndEvents extends Fragment {
         ownerId = activity.getRegisteredDancerId();
         initViews(view);
         entityList = new ArrayList<>();
+        createSchoolsAndEventsRecyclerView();
         downloadSchool();
+        downloadEvents();
         ivBack.setOnClickListener(this::back);
         return view;
     }
@@ -72,11 +74,11 @@ public class FragmentSchoolsAndEvents extends Fragment {
             @Override
             public void onResponse(Call<List<School>> call, Response<List<School>> response) {
                 List<School> schools = response.body();
-                if (schools != null) {
-                    entityList.clear();
-                    entityList.addAll(schools);
-                }
-                downloadEvents();
+
+                entityList.clear();
+                entityList.addAll(schools);
+
+                schoolsAndEventsRVAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -92,14 +94,13 @@ public class FragmentSchoolsAndEvents extends Fragment {
             @Override
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
                 List<Event> events = response.body();
-                if (events != null) {
-                    entityList.addAll(events);
-                }
-                if (schoolsAndEventsRVAdapter == null) {
-                    createSchoolsAndEventsRecyclerView();
-                } else {
-                    schoolsAndEventsRVAdapter.notifyDataSetChanged();
-                }
+
+                entityList.addAll(events);
+
+                createSchoolsAndEventsRecyclerView();
+
+                schoolsAndEventsRVAdapter.notifyDataSetChanged();
+
             }
 
             @Override
@@ -114,11 +115,11 @@ public class FragmentSchoolsAndEvents extends Fragment {
         activity.setProfile();
     }
 
-    public void delete(){
+    public void delete() {
 
     }
 
-    public void save(){
+    public void save() {
 
     }
 

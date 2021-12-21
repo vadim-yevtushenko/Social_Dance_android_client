@@ -26,10 +26,12 @@ import com.example.socialdance.R;
 import com.example.socialdance.fragment.adapter.ReviewRVAdapter;
 import com.example.socialdance.model.Rating;
 import com.example.socialdance.model.Review;
+import com.example.socialdance.model.School;
 import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.retrofit.SchoolApi;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import retrofit2.Call;
@@ -55,6 +57,7 @@ public class FragmentReviewsAndRating extends Fragment {
 
 
     private SchoolApi schoolApi;
+    private School school;
 
     private List<Review> reviewList;
 
@@ -74,9 +77,12 @@ public class FragmentReviewsAndRating extends Fragment {
         activity = (MainActivity) getActivity();
         reviewList = new ArrayList<>();
         initViews(view);
-        Integer[] grades = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        Integer[] grades = new Integer[]{1, 2, 3, 4, 5};
         spinnerAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, grades);
-        downLoadReviews();
+        spSetRating.setAdapter(spinnerAdapter);
+        downloadSchool();
+        downloadReviews();
+        createRecyclerView();
         bSend.setOnClickListener(this::sendReview);
         bSendRating.setOnClickListener(this::sendRating);
         ivBack.setOnClickListener(this::back);
@@ -87,18 +93,36 @@ public class FragmentReviewsAndRating extends Fragment {
         activity.passSchoolId(schoolId);
     }
 
-    private void sendRating(View view) {
-        Rating rating = new Rating(schoolId, activity.getRegisteredDancerId(), Integer.parseInt(spSetRating.getSelectedItem().toString()));
-        schoolApi.createRating(rating).enqueue(new Callback<Rating>() {
+    private void downloadSchool() {
+        schoolApi.getSchoolById(schoolId).enqueue(new Callback<School>() {
             @Override
-            public void onResponse(Call<Rating> call, Response<Rating> response) {
-                if (response.body() != null) {
-                    tvRating.setText("new rating");
+            public void onResponse(Call<School> call, Response<School> response) {
+                school = response.body();
+                if (school != null) {
+                    tvRating.setText(school.getRating());
                 }
+                Log.d("log", "onResponse ");
             }
 
             @Override
-            public void onFailure(Call<Rating> call, Throwable t) {
+            public void onFailure(Call<School> call, Throwable t) {
+                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
+                Log.d("log", "onFailure " + t.toString());
+            }
+        });
+    }
+
+    private void sendRating(View view) {
+        Rating rating = new Rating(schoolId, activity.getRegisteredDancerId(), Integer.parseInt(spSetRating.getSelectedItem().toString()));
+        schoolApi.createRating(rating).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                downloadSchool();
+
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
                 Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
                 Log.d("log", "onFailure " + t.toString());
             }
@@ -106,31 +130,33 @@ public class FragmentReviewsAndRating extends Fragment {
     }
 
     private void sendReview(View view) {
-        Review review = new Review();
-        schoolApi.createReview(review).enqueue(new Callback<Review>() {
+        Review review = new Review(activity.getRegisteredDancerId(), schoolId, etReview.getText().toString(), new Date());
+        schoolApi.createReview(review).enqueue(new Callback<Void>() {
             @Override
-            public void onResponse(Call<Review> call, Response<Review> response) {
-                if (response.body() != null) {
-                    etReview.setText("");
-                }
+            public void onResponse(Call<Void> call, Response<Void> response) {
+
+                etReview.setText("");
+                downloadReviews();
+
             }
 
             @Override
-            public void onFailure(Call<Review> call, Throwable t) {
+            public void onFailure(Call<Void> call, Throwable t) {
                 Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
                 Log.d("log", "onFailure " + t.toString());
             }
         });
     }
 
-    private void downLoadReviews() {
+    private void downloadReviews() {
         schoolApi.getAllReviewsBySchool(schoolId).enqueue(new Callback<List<Review>>() {
             @Override
             public void onResponse(Call<List<Review>> call, Response<List<Review>> response) {
-                reviewList = response.body();
-                if (reviewList != null) {
-                    createRecyclerView();
-                }
+                reviewList.clear();
+                reviewList.addAll(response.body());
+
+                adapter.notifyDataSetChanged();
+
             }
 
             @Override

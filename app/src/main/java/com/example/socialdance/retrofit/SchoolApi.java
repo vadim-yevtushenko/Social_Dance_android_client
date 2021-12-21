@@ -32,10 +32,10 @@ public interface SchoolApi {
     Call<School> createSchool(@Body School school);
 
     @POST("schools/reviews")
-    Call<Review> createReview(@Body Review review);
+    Call<Void> createReview(@Body Review review);
 
     @POST("schools/ratings")
-    Call<Rating> createRating(@Body Rating rating);
+    Call<Void> createRating(@Body Rating rating);
 
     @POST("schools")
     Call<School> updateSchool(@Body School school);

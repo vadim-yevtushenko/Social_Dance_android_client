@@ -1,6 +1,7 @@
 package com.example.socialdance.fragment.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +18,12 @@ import com.example.socialdance.fragment.FragmentSchoolsList;
 import java.util.List;
 
 public class SchoolRVAdapter extends RecyclerView.Adapter<SchoolRVAdapter.SchoolRecyclerVieHolder> {
-    private List<School> schools;
+    private final List<School> schools;
     private FragmentSchoolsList.SchoolPassListener passListener;
 
     public SchoolRVAdapter(List<School> schools) {
         this.schools = schools;
+
     }
 
     @NonNull
@@ -52,11 +54,11 @@ public class SchoolRVAdapter extends RecyclerView.Adapter<SchoolRVAdapter.School
     }
 
     class SchoolRecyclerVieHolder extends RecyclerView.ViewHolder {
-        private ConstraintLayout schoolItemLayout;
-        private TextView tvName;
-        private TextView tvDescription;
-        private TextView tvCity;
-        private TextView tvRating;
+        private final ConstraintLayout schoolItemLayout;
+        private final TextView tvName;
+        private final TextView tvDescription;
+        private final TextView tvCity;
+        private final TextView tvRating;
 
         public SchoolRecyclerVieHolder(@NonNull View itemView) {
             super(itemView);
