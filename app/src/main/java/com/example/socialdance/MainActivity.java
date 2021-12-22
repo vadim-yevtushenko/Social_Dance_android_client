@@ -7,6 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.socialdance.fragment.FragmentCreateSchoolOrEvent;
@@ -20,6 +21,7 @@ import com.example.socialdance.fragment.FragmentReviewsAndRating;
 import com.example.socialdance.fragment.FragmentSchool;
 import com.example.socialdance.fragment.FragmentSchoolsAndEvents;
 import com.example.socialdance.fragment.FragmentSchoolsList;
+import com.example.socialdance.model.enums.Role;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
     private TextView tvSchool;
     private TextView tvDancer;
     private TextView tvProfile;
+    private ProgressBar pbConnect;
 
     private FragmentEventsList fragmentEventsList;
     private FragmentEvent fragmentEvent;
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
     private SharedPreferences.Editor editor;
     private String PREF_REG = "reg";
     private String PREF_CHECKER = "checker";
+    public final static int TOAST_Y_GRAVITY = 500;
 
     private List<TextView> tabs;
 
@@ -67,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
 
         tabs = new ArrayList<>();
         initViews();
+        pbConnect.setVisibility(View.INVISIBLE);
         addViewsToList();
         initListeners();
         sharedPreferencesCheck = getSharedPreferences(PREF_CHECKER, MODE_PRIVATE);
@@ -245,6 +250,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
         tvSchool = findViewById(R.id.tvSchools);
         tvDancer = findViewById(R.id.tvDancers);
         tvProfile = findViewById(R.id.tvProfiles);
+        pbConnect = findViewById(R.id.pbConnect);
     }
 
     @Override
@@ -327,9 +333,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
         return registeredDancerId;
     }
 
-    public void setRegisteredDancerId(int registeredDancerId) {
-        this.registeredDancerId = registeredDancerId;
+    public ProgressBar getPbConnect() {
+        return pbConnect;
     }
-
-
 }

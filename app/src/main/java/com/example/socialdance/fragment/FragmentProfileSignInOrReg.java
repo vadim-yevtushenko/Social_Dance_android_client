@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.socialdance.MainActivity;
 import com.example.socialdance.R;
 import com.example.socialdance.model.Dancer;
 import com.example.socialdance.model.EntityInfo;
@@ -24,6 +26,8 @@ import com.example.socialdance.retrofit.NetworkService;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
 
 
 public class FragmentProfileSignInOrReg extends Fragment {
@@ -40,6 +44,8 @@ public class FragmentProfileSignInOrReg extends Fragment {
 
     private ProfileSignInOrRegPassListener profileSignInOrRegPassListener;
 
+    private MainActivity activity;
+
     @Override
     public void onAttach(@NonNull Context context) {
         dancerApi = NetworkService.getInstance().getDancerApi();
@@ -51,6 +57,7 @@ public class FragmentProfileSignInOrReg extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile_sign_in_or_reg, container, false);
+        activity = (MainActivity) getActivity();
         profileSignInOrRegPassListener = (ProfileSignInOrRegPassListener) getContext();
         initViews(view);
         bSignIn.setOnClickListener(this::signIn);
@@ -59,38 +66,46 @@ public class FragmentProfileSignInOrReg extends Fragment {
     }
 
     private void signUp(View view) {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         dancerApi.checkSignUpByEmail(etEmailReg.getText().toString()).enqueue(new Callback<Integer>() {
             @Override
             public void onResponse(Call<Integer> call, Response<Integer> response) {
                 Integer checkReg = response.body();
-                Log.d("log", "onResponse " + checkReg);
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
                 if (checkReg == null || checkReg == 0){
                     if (etPasswordReg.getText().toString().equals(etPassRetype.getText().toString())) {
                         registrationDancerOnServer();
                     } else {
-                        Toast.makeText(getActivity(), "retype password is not correct", Toast.LENGTH_LONG).show();
+                        Toast toast = Toast.makeText(activity, "retype password is not correct", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                        toast.show();
                     }
                 }else {
-                    Toast.makeText(getActivity(), "email is used", Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(activity, "email is used", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
                 }
             }
 
             @Override
             public void onFailure(Call<Integer> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "signUp onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
+
             }
         });
     }
 
     private void registrationDancerOnServer() {
         Dancer dancer = createDancer();
-
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         dancerApi.createDancer(dancer).enqueue(new Callback<Dancer>() {
             @Override
             public void onResponse(Call<Dancer> call, Response<Dancer> response) {
                 Dancer regDancer = response.body();
-                Log.d("log", "registrationDancerOnServer onResponse " + regDancer);
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
                 if (regDancer != null) {
                     profileSignInOrRegPassListener.passRegDancerId(regDancer.getId());
                 }
@@ -98,8 +113,10 @@ public class FragmentProfileSignInOrReg extends Fragment {
 
             @Override
             public void onFailure(Call<Dancer> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "registrationDancerOnServer onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }
@@ -114,22 +131,28 @@ public class FragmentProfileSignInOrReg extends Fragment {
     }
 
     private void signIn(View view) {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         dancerApi.checkSignInByEmailAndPassword(etEmail.getText().toString(), etPassword.getText().toString()).
                 enqueue(new Callback<Integer>() {
                     @Override
                     public void onResponse(Call<Integer> call, Response<Integer> response) {
                         Integer check = response.body();
+                        activity.getPbConnect().setVisibility(View.INVISIBLE);
                         if (check != null && check > 0){
                             profileSignInOrRegPassListener.passRegDancerId(check);
                         }else {
-                            Toast.makeText(getActivity(), "wrong login or password", Toast.LENGTH_LONG).show();
+                            Toast toast = Toast.makeText(activity, "wrong login or password", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                            toast.show();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<Integer> call, Throwable t) {
-                        Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                        Log.d("log", "signIn onFailure " + t.toString());
+                        activity.getPbConnect().setVisibility(View.INVISIBLE);
+                        Toast toast = Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                        toast.show();
                     }
                 });
     }

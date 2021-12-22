@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
 
 
 public class FragmentProfile extends Fragment {
@@ -70,6 +73,7 @@ public class FragmentProfile extends Fragment {
     }
 
     private void downloadDancer() {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         dancerApi.getDancerById(id).enqueue(new Callback<Dancer>() {
             @Override
             public void onResponse(Call<Dancer> call, Response<Dancer> response) {
@@ -79,14 +83,16 @@ public class FragmentProfile extends Fragment {
                     return;
                 }
                 dancerList.add(dancer);
-                Log.d("log", "downloadDancer onResponse ");
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
                 profileRVAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onFailure(Call<Dancer> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }
@@ -99,7 +105,7 @@ public class FragmentProfile extends Fragment {
 
     private void save(View view) {
         createDancerForSave();
-        Log.d("log", "save " + dancer);
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         dancerApi.updateDancer(dancer).enqueue(new Callback<Dancer>() {
             @Override
             public void onResponse(Call<Dancer> call, Response<Dancer> response) {
@@ -111,13 +117,18 @@ public class FragmentProfile extends Fragment {
                     downloadDancer();
                 }
                 profileRVAdapter.notifyDataSetChanged();
-                Toast.makeText(getActivity(), "SAVED", Toast.LENGTH_LONG).show();
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(getActivity(), "SAVED", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
 
             @Override
             public void onFailure(Call<Dancer> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }
@@ -185,6 +196,13 @@ public class FragmentProfile extends Fragment {
     private void initViews(View view) {
         ivSave = view.findViewById(R.id.ivSave);
         rvProfile = view.findViewById(R.id.rvProfile);
+    }
+
+    public boolean isTeacher(){
+        if (dancer == null || dancer.getRole() == null){
+            return false;
+        }
+        return dancer.getRole() == Role.TEACHER;
     }
 
     public Dancer getDancer() {

@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
 
 public class FragmentEvent extends Fragment {
 
@@ -71,18 +74,22 @@ public class FragmentEvent extends Fragment {
     }
 
     private void downloadEvent() {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         eventApi.getEventById(id).enqueue(new Callback<Event>() {
             @Override
             public void onResponse(Call<Event> call, Response<Event> response) {
+
                 event = response.body();
                 fillForm();
-                Log.d("log", "onResponse ");
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onFailure(Call<Event> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }

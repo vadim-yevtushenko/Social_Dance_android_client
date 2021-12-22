@@ -10,11 +10,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.socialdance.MainActivity;
 import com.example.socialdance.R;
 import com.example.socialdance.model.Event;
 import com.example.socialdance.model.School;
@@ -30,6 +32,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
+
 
 public class FragmentSchoolsList extends Fragment {
 
@@ -39,6 +43,8 @@ public class FragmentSchoolsList extends Fragment {
     private List<School> schoolsList;
 
     private SchoolApi schoolApi;
+
+    private MainActivity activity;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -51,6 +57,7 @@ public class FragmentSchoolsList extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schools_list, container, false);
+        activity = (MainActivity) getActivity();
         initViews(view);
         schoolsList = new ArrayList<>();
         createRVList();
@@ -60,18 +67,22 @@ public class FragmentSchoolsList extends Fragment {
     }
 
     private void downloadSchools() {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         schoolApi.getAllSchools().enqueue(new Callback<List<School>>() {
             @Override
             public void onResponse(Call<List<School>> call, Response<List<School>> response) {
 
                 schoolsList.addAll(response.body());
                 adapter.notifyDataSetChanged();
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onFailure(Call<List<School>> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }

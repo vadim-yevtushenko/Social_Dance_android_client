@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.socialdance.MainActivity;
 import com.example.socialdance.R;
 import com.example.socialdance.fragment.FragmentSchoolsAndEvents;
 import com.example.socialdance.model.AbstractBaseEntity;
@@ -39,8 +42,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
+
 public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEventsRVAdapter.SchoolsAndEventsRecyclerViewHolder> {
     private Context context;
+    MainActivity activity;
     private List<AbstractBaseEntity> entityList;
     private FragmentSchoolsAndEvents fragmentSchoolsAndEvents;
     private ArrayAdapter<String> spinnerAdapter;
@@ -62,7 +68,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
     @Override
     public SchoolsAndEventsRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
-
+        activity = (MainActivity) context;
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.schools_and_events_item, parent, false);
         SchoolsAndEventsRecyclerViewHolder viewHolder = new SchoolsAndEventsRecyclerViewHolder(view);
@@ -102,11 +108,11 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
                                     append(".").append(year);
                             holder.tvDateShow.setText(dateBuilder.toString() + timeBuilder.toString());
                             try {
-                                ((Event) entity).setDateEvent(DateTimeUtils.dateTimeFormat.parse(dateBuilder.toString() + timeBuilder.toString()));
+                                ((Event) entity).setDateEvent(DateTimeUtils.dateTimeFormat
+                                        .parse(dateBuilder.toString() + timeBuilder.toString()));
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }
-                            Log.d("log", "date " + ((Event)entity).getDateFinishEvent());
                         },
                         calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),
@@ -142,12 +148,11 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
                                     append(".").append(year);
                             holder.tvDateToShow.setText(dateBuilder.toString() + timeBuilder.toString());
                             try {
-                                ((Event)entity).setDateFinishEvent(DateTimeUtils.dateTimeFormat.parse(dateBuilder.toString() + timeBuilder.toString()));
+                                ((Event)entity).setDateFinishEvent(DateTimeUtils.dateTimeFormat
+                                        .parse(dateBuilder.toString() + timeBuilder.toString()));
                             } catch (ParseException e) {
                                 e.printStackTrace();
                             }
-                            Log.d("log", "date to " + ((Event)entity).getDateFinishEvent());
-
                         },
                         calendar.get(Calendar.YEAR),
                         calendar.get(Calendar.MONTH),
@@ -178,10 +183,28 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
             holder.tvDateToShow.setVisibility(View.INVISIBLE);
         }
         holder.bDelete.setOnClickListener(v -> {
+
             if (entity instanceof Event){
-                deleteEvent(entity.getId());
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(context).
+                        setTitle("Your event will be deleted!").
+                        setMessage("Do you want delete your event?").
+                        setPositiveButton("YES", (dialog, which) -> {
+                            deleteEvent(entity.getId());
+                        }).
+                        setNeutralButton("CANCEL", (dialog, which) -> {
+                        });
+                alertDialog.show();
             }else {
-                deleteSchool(entity.getId());
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(context).
+                        setTitle("Your school will be deleted!").
+                        setMessage("Do you want delete your school?").
+                        setPositiveButton("YES", (dialog, which) -> {
+                            deleteSchool(entity.getId());
+                        }).
+                        setNeutralButton("CANCEL", (dialog, which) -> {
+                        });
+                alertDialog.show();
+
             }
             fragmentSchoolsAndEvents.createSchoolsAndEventsRecyclerView();
         });
@@ -197,37 +220,49 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
     }
 
     private void saveSchool(School school) {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         schoolApi.updateSchool(school).enqueue(new Callback<School>() {
             @Override
             public void onResponse(Call<School> call, Response<School> response) {
                 School newSchool = response.body();
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
                 if (newSchool != null){
-                    Toast.makeText(fragmentSchoolsAndEvents.getActivity(), "School saved", Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(activity, "School saved", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
                 }
             }
 
             @Override
             public void onFailure(Call<School> call, Throwable t) {
-                Toast.makeText(fragmentSchoolsAndEvents.getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }
 
     private void saveEvent(Event event) {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         eventApi.updateEvent(event).enqueue(new Callback<Event>() {
             @Override
             public void onResponse(Call<Event> call, Response<Event> response) {
                 Event newEvent = response.body();
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
                 if (newEvent != null){
-                    Toast.makeText(fragmentSchoolsAndEvents.getActivity(), "Event saved", Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(activity, "Event saved", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
                 }
             }
 
             @Override
             public void onFailure(Call<Event> call, Throwable t) {
-                Toast.makeText(fragmentSchoolsAndEvents.getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }
@@ -275,33 +310,45 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
     }
 
     private void deleteEvent(int id) {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         eventApi.deleteEvent(id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                Toast.makeText(fragmentSchoolsAndEvents.getActivity(), "Your event deleted", Toast.LENGTH_LONG).show();
+                Toast toast = Toast.makeText(activity, "Your event deleted", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
                 fragmentSchoolsAndEvents.downloadSchool();
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(fragmentSchoolsAndEvents.getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }
 
     private void deleteSchool(int id) {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         schoolApi.deleteSchool(id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                Toast.makeText(fragmentSchoolsAndEvents.getActivity(), "Your school deleted", Toast.LENGTH_LONG).show();
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Your school deleted", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
                 fragmentSchoolsAndEvents.downloadSchool();
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(fragmentSchoolsAndEvents.getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }

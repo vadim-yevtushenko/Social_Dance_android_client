@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
 
 
 public class FragmentSchoolsAndEvents extends Fragment {
@@ -64,40 +67,42 @@ public class FragmentSchoolsAndEvents extends Fragment {
         entityList = new ArrayList<>();
         createSchoolsAndEventsRecyclerView();
         downloadSchool();
-        downloadEvents();
+//        downloadEvents();
         ivBack.setOnClickListener(this::back);
         return view;
     }
 
     public void downloadSchool() {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         schoolApi.getAllSchoolsByOwnerId(ownerId).enqueue(new Callback<List<School>>() {
             @Override
             public void onResponse(Call<List<School>> call, Response<List<School>> response) {
                 List<School> schools = response.body();
-
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
                 entityList.clear();
                 entityList.addAll(schools);
-
-                schoolsAndEventsRVAdapter.notifyDataSetChanged();
+                downloadEvents();
+//                schoolsAndEventsRVAdapter.notifyDataSetChanged();
             }
 
             @Override
             public void onFailure(Call<List<School>> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }
 
     private void downloadEvents() {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         eventApi.getAllEventsByOwnerId(ownerId).enqueue(new Callback<List<Event>>() {
             @Override
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
                 List<Event> events = response.body();
-
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
                 entityList.addAll(events);
-
-                createSchoolsAndEventsRecyclerView();
 
                 schoolsAndEventsRVAdapter.notifyDataSetChanged();
 
@@ -105,8 +110,10 @@ public class FragmentSchoolsAndEvents extends Fragment {
 
             @Override
             public void onFailure(Call<List<Event>> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }

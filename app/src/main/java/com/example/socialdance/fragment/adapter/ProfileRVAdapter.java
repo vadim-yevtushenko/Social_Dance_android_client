@@ -3,6 +3,7 @@ package com.example.socialdance.fragment.adapter;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
+
 public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.ProfileRecyclerViewHolder> {
 
     private Context context;
@@ -47,6 +50,8 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
     private ArrayAdapter<Role> spinnerAdapter;
     private MainActivity activity;
     private ProfileRecyclerViewHolder holderGlobal;
+
+
 
     public ProfileRVAdapter(List<Dancer> dancerList, FragmentProfile fragmentProfile) {
         this.dancerList = dancerList;
@@ -144,7 +149,9 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             if (dancer.getRole() != null) {
                 activity.setFragmentCreateSchoolOrEvent();
             } else {
-                Toast.makeText(activity, "save your ROLE, please", Toast.LENGTH_LONG).show();
+                Toast toast = Toast.makeText(activity, "save your ROLE, please", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
 
@@ -154,18 +161,24 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
     }
 
     public void deleteDancer(int id){
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         fragmentProfile.getDancerApi().deleteDancer(id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 response.body();
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
                 fragmentProfile.exitProfile();
-                Toast.makeText(activity, "DELETED", Toast.LENGTH_LONG).show();
+                Toast toast = Toast.makeText(activity, "DELETED", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }

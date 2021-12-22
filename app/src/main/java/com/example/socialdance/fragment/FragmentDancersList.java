@@ -10,11 +10,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.example.socialdance.MainActivity;
 import com.example.socialdance.R;
 import com.example.socialdance.model.Dancer;
 import com.example.socialdance.fragment.adapter.DancerRVAdapter;
@@ -30,6 +32,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
+
 
 public class FragmentDancersList extends Fragment {
 
@@ -39,6 +43,8 @@ public class FragmentDancersList extends Fragment {
     private List<Dancer> dancersList;
 
     private DancerApi dancerApi;
+
+    private MainActivity activity;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -50,6 +56,7 @@ public class FragmentDancersList extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dancers_list, container, false);
+        activity = (MainActivity) getActivity();
         initViews(view);
         dancersList = new ArrayList<>();
         createRVList();
@@ -59,20 +66,24 @@ public class FragmentDancersList extends Fragment {
     }
 
     private void downloadEvents() {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         dancerApi.getAllDancers().enqueue(new Callback<List<Dancer>>() {
             @Override
             public void onResponse(Call<List<Dancer>> call, Response<List<Dancer>> response) {
+
                 dancersList.addAll(response.body());
 
                 adapter.notifyDataSetChanged();
 
-                Log.d("log", "onResponse ");
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onFailure(Call<List<Dancer>> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }

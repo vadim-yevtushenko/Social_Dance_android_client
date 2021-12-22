@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
+
 
 public class FragmentReviewsAndRating extends Fragment {
 
@@ -49,17 +52,18 @@ public class FragmentReviewsAndRating extends Fragment {
     private RecyclerView rvReviews;
     private Spinner spSetRating;
     private TextView tvRating;
+    private TextView tvSchoolName;
     private EditText etReview;
     private Button bSend;
     private Button bSendRating;
 
     private ArrayAdapter<Integer> spinnerAdapter;
 
-
     private SchoolApi schoolApi;
     private School school;
 
     private List<Review> reviewList;
+
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -80,6 +84,7 @@ public class FragmentReviewsAndRating extends Fragment {
         Integer[] grades = new Integer[]{1, 2, 3, 4, 5};
         spinnerAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, grades);
         spSetRating.setAdapter(spinnerAdapter);
+        setSpinnerValue();
         downloadSchool();
         downloadReviews();
         createRecyclerView();
@@ -87,6 +92,23 @@ public class FragmentReviewsAndRating extends Fragment {
         bSendRating.setOnClickListener(this::sendRating);
         ivBack.setOnClickListener(this::back);
         return view;
+    }
+
+    private void setSpinnerValue() {
+        schoolApi.getRatingByDancerId(schoolId, activity.getRegisteredDancerId()).enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                Integer rating = response.body();
+                if (rating != null && rating > 0){
+                    spSetRating.setSelection(rating - 1);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+
+            }
+        });
     }
 
     private void back(View view) {
@@ -98,54 +120,79 @@ public class FragmentReviewsAndRating extends Fragment {
             @Override
             public void onResponse(Call<School> call, Response<School> response) {
                 school = response.body();
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
                 if (school != null) {
                     tvRating.setText(school.getRating());
+                    tvSchoolName.setText(school.getName());
                 }
-                Log.d("log", "onResponse ");
+
             }
 
             @Override
             public void onFailure(Call<School> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }
 
     private void sendRating(View view) {
-        Rating rating = new Rating(schoolId, activity.getRegisteredDancerId(), Integer.parseInt(spSetRating.getSelectedItem().toString()));
-        schoolApi.createRating(rating).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                downloadSchool();
+        if (activity.isEntered()) {
+            Rating rating = new Rating(schoolId, activity.getRegisteredDancerId(), Integer.parseInt(spSetRating.getSelectedItem().toString()));
+            activity.getPbConnect().setVisibility(View.VISIBLE);
+            schoolApi.createRating(rating).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    downloadSchool();
 
-            }
+                }
 
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
-            }
-        });
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    activity.getPbConnect().setVisibility(View.INVISIBLE);
+                    Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
+                }
+            });
+        } else {
+            Toast toast = Toast.makeText(activity, "Sign In or Sign UP\nto set a rating!", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+            toast.show();
+        }
     }
 
     private void sendReview(View view) {
-        Review review = new Review(activity.getRegisteredDancerId(), schoolId, etReview.getText().toString(), new Date());
-        schoolApi.createReview(review).enqueue(new Callback<Void>() {
-            @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-
-                etReview.setText("");
-                downloadReviews();
-
+        if (activity.isEntered()) {
+            if (etReview.getText().toString().trim().isEmpty()){
+                return;
             }
+            Review review = new Review(activity.getRegisteredDancerId(), schoolId, etReview.getText().toString(), new Date());
+            activity.getPbConnect().setVisibility(View.VISIBLE);
+            schoolApi.createReview(review).enqueue(new Callback<Void>() {
+                @Override
+                public void onResponse(Call<Void> call, Response<Void> response) {
 
-            @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
-            }
-        });
+                    etReview.setText("");
+                    downloadReviews();
+
+                }
+
+                @Override
+                public void onFailure(Call<Void> call, Throwable t) {
+                    activity.getPbConnect().setVisibility(View.INVISIBLE);
+                    Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
+                }
+            });
+        } else {
+            Toast toast = Toast.makeText(activity, "Sign In or Sign UP\nto send a review!", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+            toast.show();
+        }
     }
 
     private void downloadReviews() {
@@ -154,15 +201,17 @@ public class FragmentReviewsAndRating extends Fragment {
             public void onResponse(Call<List<Review>> call, Response<List<Review>> response) {
                 reviewList.clear();
                 reviewList.addAll(response.body());
-
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
                 adapter.notifyDataSetChanged();
 
             }
 
             @Override
             public void onFailure(Call<List<Review>> call, Throwable t) {
-                Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }
@@ -183,5 +232,6 @@ public class FragmentReviewsAndRating extends Fragment {
         etReview = view.findViewById(R.id.etReview);
         bSend = view.findViewById(R.id.bSend);
         bSendRating = view.findViewById(R.id.bSendRating);
+        tvSchoolName = view.findViewById(R.id.tvSchoolName);
     }
 }

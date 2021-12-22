@@ -1,13 +1,14 @@
 package com.example.socialdance.fragment;
 
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +31,9 @@ import com.example.socialdance.model.enums.Dances;
 import com.example.socialdance.retrofit.EventApi;
 import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.retrofit.SchoolApi;
+import com.example.socialdance.utils.DateTimeUtils;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,6 +42,8 @@ import java.util.GregorianCalendar;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.example.socialdance.MainActivity.*;
 
 
 public class FragmentCreateSchoolOrEvent extends Fragment {
@@ -58,7 +63,7 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
     private Button bDateTo;
     private ImageView ivSave;
     private ImageView ivBack;
-//    private ImageView ivAvatar;
+    //    private ImageView ivAvatar;
 //    private CircleTextView ctvAvatar;
     private Spinner spRole;
     private CheckBox cbBachata;
@@ -110,74 +115,85 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
     }
 
     private void create(View view) {
-        if (spRole.getSelectedItem().equals(EVENT)){
+        if (spRole.getSelectedItem().equals(EVENT)) {
             createEvent();
-//            Toast.makeText(activity, "Event saved successfully", Toast.LENGTH_LONG).show();
-        }else if (spRole.getSelectedItem().equals(SCHOOL)){
+        } else if (spRole.getSelectedItem().equals(SCHOOL)) {
             createSchool();
-//            Toast.makeText(activity, "School saved successfully", Toast.LENGTH_LONG).show();
         }
 
     }
 
     private void createSchool() {
+
         School school = prepareSchoolForCreate();
-        if (school.getName() == null || school.getName().isEmpty()){
-            Toast.makeText(activity, "Enter the name school", Toast.LENGTH_LONG).show();
+        if (school.getName() == null || school.getName().isEmpty()) {
+            Toast toast = Toast.makeText(activity, "Enter the name school", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+            toast.show();
             return;
         }
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         schoolApi.createSchool(school).enqueue(new Callback<School>() {
             @Override
             public void onResponse(Call<School> call, Response<School> response) {
+
                 School newSchool = response.body();
 
                 if (newSchool != null) {
-                    Toast.makeText(activity, "School saved successfully", Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(activity, "School saved successfully", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
                 } else {
-                    Toast.makeText(activity, "School not saved", Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(activity, "School not saved", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
                 }
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onFailure(Call<School> call, Throwable t) {
-                Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
+
     }
 
     private School prepareSchoolForCreate() {
         School school = new School();
         school.setOwnerId(activity.getRegisteredDancerId());
         EntityInfo entityInfo = new EntityInfo(etCountry.getText().toString(), etCity.getText().toString(),
-                etStreet.getText().toString(), etBuilding.getText().toString(),etSuite.getText().toString(),
+                etStreet.getText().toString(), etBuilding.getText().toString(), etSuite.getText().toString(),
                 etPhone.getText().toString(), null);
         school.setName(etName.getText().toString());
         school.setDescription(etDescription.getText().toString());
         school.setEntityInfo(entityInfo);
         school.setDances(new ArrayList<>());
-        if (cbSalsa.isChecked()){
+        if (cbSalsa.isChecked()) {
             school.getDances().add(Dances.SALSA);
         }
-        if (cbBachata.isChecked()){
+        if (cbBachata.isChecked()) {
             school.getDances().add(Dances.BACHATA);
         }
-        if (cbKizomba.isChecked()){
+        if (cbKizomba.isChecked()) {
             school.getDances().add(Dances.KIZOMBA);
         }
-        if (cbZouk.isChecked()){
+        if (cbZouk.isChecked()) {
             school.getDances().add(Dances.ZOUK);
         }
-        if (cbReggaeton.isChecked()){
+        if (cbReggaeton.isChecked()) {
             school.getDances().add(Dances.REGGAETON);
         }
-        if (cbMerenge.isChecked()){
+        if (cbMerenge.isChecked()) {
             school.getDances().add(Dances.MERENGE);
         }
-        if (cbMambo.isChecked()){
+        if (cbMambo.isChecked()) {
             school.getDances().add(Dances.MAMBO);
         }
-        if (cbTango.isChecked()){
+        if (cbTango.isChecked()) {
             school.getDances().add(Dances.TANGO);
         }
         return school;
@@ -185,32 +201,43 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
 
     private void createEvent() {
         Event event = prepareEventForCreate();
-        if (event.getName() == null || event.getName().isEmpty()){
-            Toast.makeText(activity, "Enter the name event", Toast.LENGTH_LONG).show();
+        if (event.getName() == null || event.getName().isEmpty()) {
+            Toast toast = Toast.makeText(activity, "Enter the name event", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+            toast.show();
             return;
         }
-        if (event.getDateEvent() == null){
-            Toast.makeText(activity, "Enter the date event", Toast.LENGTH_LONG).show();
+        if (event.getDateEvent() == null) {
+            Toast toast = Toast.makeText(activity, "Enter the date event", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+            toast.show();
             return;
         }
-        Log.d("log", "createEvent " + event);
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         eventApi.createEvent(event).enqueue(new Callback<Event>() {
             @Override
             public void onResponse(Call<Event> call, Response<Event> response) {
+
                 Event newEvent = response.body();
-                Log.d("log", "onResponse " + newEvent);
 
                 if (newEvent != null) {
-                    Toast.makeText(activity, "Event saved successfully", Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(activity, "Event saved successfully", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
                 } else {
-                    Toast.makeText(activity, "Event not saved", Toast.LENGTH_LONG).show();
+                    Toast toast = Toast.makeText(activity, "Event not saved", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
                 }
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onFailure(Call<Event> call, Throwable t) {
-                Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }
@@ -219,34 +246,34 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
         Event event = new Event();
         event.setOwnerId(activity.getRegisteredDancerId());
         EntityInfo entityInfo = new EntityInfo(etCountry.getText().toString(), etCity.getText().toString(),
-                etStreet.getText().toString(), etBuilding.getText().toString(),etSuite.getText().toString(),
+                etStreet.getText().toString(), etBuilding.getText().toString(), etSuite.getText().toString(),
                 etPhone.getText().toString(), null);
         event.setName(etName.getText().toString());
         event.setDescription(etDescription.getText().toString());
         event.setEntityInfo(entityInfo);
         event.setDances(new ArrayList<>());
-        if (cbSalsa.isChecked()){
+        if (cbSalsa.isChecked()) {
             event.getDances().add(Dances.SALSA);
         }
-        if (cbBachata.isChecked()){
+        if (cbBachata.isChecked()) {
             event.getDances().add(Dances.BACHATA);
         }
-        if (cbKizomba.isChecked()){
+        if (cbKizomba.isChecked()) {
             event.getDances().add(Dances.KIZOMBA);
         }
-        if (cbZouk.isChecked()){
+        if (cbZouk.isChecked()) {
             event.getDances().add(Dances.ZOUK);
         }
-        if (cbReggaeton.isChecked()){
+        if (cbReggaeton.isChecked()) {
             event.getDances().add(Dances.REGGAETON);
         }
-        if (cbMerenge.isChecked()){
+        if (cbMerenge.isChecked()) {
             event.getDances().add(Dances.MERENGE);
         }
-        if (cbMambo.isChecked()){
+        if (cbMambo.isChecked()) {
             event.getDances().add(Dances.MAMBO);
         }
-        if (cbTango.isChecked()){
+        if (cbTango.isChecked()) {
             event.getDances().add(Dances.TANGO);
         }
         event.setDatePublication(new Date());
@@ -259,12 +286,12 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
         spRole.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                if (spRole.getSelectedItem().equals(SCHOOL)){
+                if (spRole.getSelectedItem().equals(SCHOOL)) {
                     bDate.setVisibility(View.INVISIBLE);
                     bDateTo.setVisibility(View.INVISIBLE);
                     tvDateShow.setVisibility(View.INVISIBLE);
                     tvDateToShow.setVisibility(View.INVISIBLE);
-                }else {
+                } else {
                     bDate.setVisibility(View.VISIBLE);
                     bDateTo.setVisibility(View.VISIBLE);
                     tvDateShow.setVisibility(View.VISIBLE);
@@ -280,35 +307,80 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
 
         bDate.setOnClickListener(v -> {
             Calendar calendar = new GregorianCalendar();
+            StringBuilder dateBuilder = new StringBuilder();
+            StringBuilder timeBuilder = new StringBuilder();
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     getActivity(),
                     (DatePickerDialog.OnDateSetListener) (view1, year, month, dayOfMonth) -> {
-                        tvDateShow.setText(dayOfMonth + "." + (month + 1) + "." + year);
-                        dateStart = new GregorianCalendar(year, month, dayOfMonth).getTime();
+                        dateBuilder.append(dayOfMonth).
+                                append(".").append(month + 1).
+                                append(".").append(year);
+                        tvDateShow.setText(dateBuilder.toString() + timeBuilder.toString());
+                        try {
+                            dateStart = DateTimeUtils.dateTimeFormat
+                                    .parse(dateBuilder.toString() + timeBuilder.toString());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     },
                     calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH),
                     calendar.get(Calendar.DAY_OF_MONTH)
 
             );
+            TimePickerDialog timePickerDialog = new TimePickerDialog(
+                    getActivity(),
+                    (view, hourOfDay, minute) -> {
+                        timeBuilder.append(" ").
+                                append(String.valueOf(hourOfDay).length() == 1 ? "0" + hourOfDay : hourOfDay).
+                                append(":").append(String.valueOf(minute).length() == 1 ? "0" + minute : minute);
+                    },
+                    calendar.get(Calendar.HOUR),
+                    calendar.get(Calendar.MINUTE),
+                    true
+            );
             datePickerDialog.getDatePicker().setMinDate(new Date().getTime());
             datePickerDialog.show();
+            timePickerDialog.show();
         });
+
         bDateTo.setOnClickListener(v -> {
             Calendar calendar = new GregorianCalendar();
+            StringBuilder dateBuilder = new StringBuilder();
+            StringBuilder timeBuilder = new StringBuilder();
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     getActivity(),
                     (DatePickerDialog.OnDateSetListener) (view1, year, month, dayOfMonth) -> {
-                        tvDateToShow.setText(dayOfMonth + "." + (month + 1) + "." + year);
-                        dateFinish = new GregorianCalendar(year, month, dayOfMonth).getTime();
+                        dateBuilder.append(dayOfMonth).
+                                append(".").append(month + 1).
+                                append(".").append(year);
+                        tvDateToShow.setText(dateBuilder.toString() + timeBuilder.toString());
+                        try {
+                            dateFinish = DateTimeUtils.dateTimeFormat
+                                    .parse(dateBuilder.toString() + timeBuilder.toString());
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
                     },
                     calendar.get(Calendar.YEAR),
                     calendar.get(Calendar.MONTH),
                     calendar.get(Calendar.DAY_OF_MONTH)
 
             );
+            TimePickerDialog timePickerDialog = new TimePickerDialog(
+                    getActivity(),
+                    (view, hourOfDay, minute) -> {
+                        timeBuilder.append(" ").
+                                append(String.valueOf(hourOfDay).length() == 1 ? "0" + hourOfDay : hourOfDay).
+                                append(":").append(String.valueOf(minute).length() == 1 ? "0" + minute : minute);
+                    },
+                    calendar.get(Calendar.HOUR),
+                    calendar.get(0),
+                    true
+            );
             datePickerDialog.getDatePicker().setMinDate(new Date().getTime());
             datePickerDialog.show();
+            timePickerDialog.show();
         });
     }
 

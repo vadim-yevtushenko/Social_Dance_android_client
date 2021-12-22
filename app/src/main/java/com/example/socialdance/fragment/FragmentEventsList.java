@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,8 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
 
 
 public class FragmentEventsList extends Fragment {
@@ -62,19 +65,23 @@ public class FragmentEventsList extends Fragment {
     }
 
     private void downloadEvents() {
+        activity.getPbConnect().setVisibility(View.VISIBLE);
         eventApi.getAllEvents().enqueue(new Callback<List<Event>>() {
             @Override
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
+
                 eventsList.addAll(response.body());
                 adapter.notifyDataSetChanged();
 
-                Log.d("log", "onResponse ");
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
             }
 
             @Override
             public void onFailure(Call<List<Event>> call, Throwable t) {
-                Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG).show();
-                Log.d("log", "onFailure " + t.toString());
+                activity.getPbConnect().setVisibility(View.INVISIBLE);
+                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
             }
         });
     }

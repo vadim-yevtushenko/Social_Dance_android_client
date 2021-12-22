@@ -28,6 +28,9 @@ public interface SchoolApi {
     @GET("schools/{id}")
     Call<School> getSchoolById(@Path("id") Integer id);
 
+    @GET("schools/{id}/{dancerId}")
+    Call<Integer> getRatingByDancerId(@Path("id") Integer schoolId, @Path("dancerId") Integer dancerId);
+
     @POST("schools")
     Call<School> createSchool(@Body School school);
 

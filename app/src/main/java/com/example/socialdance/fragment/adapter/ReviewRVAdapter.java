@@ -41,7 +41,7 @@ public class ReviewRVAdapter extends RecyclerView.Adapter<ReviewRVAdapter.Review
     public void onBindViewHolder(@NonNull ReviewRVAdapter.ReviewRecyclerViewHolder holder, int position) {
         holder.tvReview.setText(reviewList.get(position).getReview());
         holder.tvDateReview.setText(DateTimeUtils.dateTimeFormat.format(reviewList.get(position).getDateTime()));
-        holder.tvName.setText(String.valueOf(reviewList.get(position).getAbstractBaseEntityId()));
+//        holder.tvName.setText(String.valueOf(reviewList.get(position).getAbstractBaseEntityId()));
     }
 
     @Override
@@ -53,13 +53,13 @@ public class ReviewRVAdapter extends RecyclerView.Adapter<ReviewRVAdapter.Review
 
         private TextView tvReview;
         private TextView tvDateReview;
-        private TextView tvName;
+//        private TextView tvName;
 
         public ReviewRecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
             tvDateReview = itemView.findViewById(R.id.tvDateReview);
             tvReview = itemView.findViewById(R.id.tvReview);
-            tvName = itemView.findViewById(R.id.tvName);
+//            tvName = itemView.findViewById(R.id.tvName);
         }
     }
 }
