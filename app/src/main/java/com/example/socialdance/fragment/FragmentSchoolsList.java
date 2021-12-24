@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,8 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.socialdance.MainActivity;
@@ -41,6 +44,7 @@ public class FragmentSchoolsList extends Fragment {
     private LinearLayoutManager linearLayoutManager;
     private SchoolRVAdapter adapter;
     private List<School> schoolsList;
+    private EditText etForSearch;
 
     private SchoolApi schoolApi;
 
@@ -62,7 +66,7 @@ public class FragmentSchoolsList extends Fragment {
         schoolsList = new ArrayList<>();
         createRVList();
         downloadSchools();
-
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -71,7 +75,7 @@ public class FragmentSchoolsList extends Fragment {
         schoolApi.getAllSchools().enqueue(new Callback<List<School>>() {
             @Override
             public void onResponse(Call<List<School>> call, Response<List<School>> response) {
-
+                schoolsList.clear();
                 schoolsList.addAll(response.body());
                 adapter.notifyDataSetChanged();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
@@ -98,6 +102,56 @@ public class FragmentSchoolsList extends Fragment {
 
     private void initViews(View view) {
         rvSchoolsList = view.findViewById(R.id.rvSchoolsList);
+        etForSearch = new EditText(view.getContext());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.itemSearch) {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+            alertDialog.setTitle("Search by city");
+            alertDialog.setMessage("input city: ");
+            alertDialog.setView(etForSearch);
+            alertDialog.setPositiveButton("SEARCH", (dialog, which) -> {
+                downloadSchoolsByCity();
+            });
+            alertDialog.setNeutralButton("CANCEL", (dialog, which) -> {
+            });
+            if (etForSearch.getParent() != null) {
+                ((ViewGroup)etForSearch.getParent()).removeView(etForSearch);
+            }
+            alertDialog.show();
+        } else if (itemId == R.id.itemAll){
+            downloadSchools();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void downloadSchoolsByCity() {
+        String city = etForSearch.getText().toString();
+        etForSearch.setText("");
+        if (!city.trim().isEmpty()){
+            activity.getPbConnect().setVisibility(View.VISIBLE);
+            schoolApi.getAllSchoolsByCity(city).enqueue(new Callback<List<School>>() {
+                @Override
+                public void onResponse(Call<List<School>> call, Response<List<School>> response) {
+                    List<School> schoolsByCity = response.body();
+                    activity.getPbConnect().setVisibility(View.INVISIBLE);
+                    schoolsList.clear();
+                    schoolsList.addAll(schoolsByCity);
+                    adapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onFailure(Call<List<School>> call, Throwable t) {
+                    activity.getPbConnect().setVisibility(View.INVISIBLE);
+                    Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
+                }
+            });
+        }
     }
 
     public interface SchoolPassListener {

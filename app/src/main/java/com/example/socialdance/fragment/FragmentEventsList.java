@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -12,8 +13,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.socialdance.MainActivity;
@@ -41,6 +44,7 @@ public class FragmentEventsList extends Fragment {
     private LinearLayoutManager linearLayoutManager;
     private EventRVAdapter adapter;
     private List<Event> eventsList;
+    private EditText etForSearch;
 
     private EventApi eventApi;
 
@@ -60,7 +64,7 @@ public class FragmentEventsList extends Fragment {
         eventsList = new ArrayList<>();
         createRVList();
         downloadEvents();
-
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -69,7 +73,7 @@ public class FragmentEventsList extends Fragment {
         eventApi.getAllEvents().enqueue(new Callback<List<Event>>() {
             @Override
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
-
+                eventsList.clear();
                 eventsList.addAll(response.body());
                 adapter.notifyDataSetChanged();
 
@@ -97,6 +101,56 @@ public class FragmentEventsList extends Fragment {
 
     private void initViews(View view) {
         rvEventsList = view.findViewById(R.id.rvEventsList);
+        etForSearch = new EditText(view.getContext());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.itemSearch) {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+            alertDialog.setTitle("Search by city");
+            alertDialog.setMessage("input city: ");
+            alertDialog.setView(etForSearch);
+            alertDialog.setPositiveButton("SEARCH", (dialog, which) ->
+                    downloadEventsByCity());
+
+            alertDialog.setNeutralButton("CANCEL", (dialog, which) -> {
+            });
+            if (etForSearch.getParent() != null) {
+                ((ViewGroup)etForSearch.getParent()).removeView(etForSearch);
+            }
+            alertDialog.show();
+        } else if (itemId == R.id.itemAll) {
+            downloadEvents();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void downloadEventsByCity() {
+        String city = etForSearch.getText().toString();
+        etForSearch.setText("");
+        if (!city.trim().isEmpty()) {
+            activity.getPbConnect().setVisibility(View.VISIBLE);
+            eventApi.getAllEventsByCity(city).enqueue(new Callback<List<Event>>() {
+                @Override
+                public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
+                    List<Event> eventsByCity = response.body();
+                    activity.getPbConnect().setVisibility(View.INVISIBLE);
+                    eventsList.clear();
+                    eventsList.addAll(eventsByCity);
+                    adapter.notifyDataSetChanged();
+                }
+
+                @Override
+                public void onFailure(Call<List<Event>> call, Throwable t) {
+                    activity.getPbConnect().setVisibility(View.INVISIBLE);
+                    Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
+                }
+            });
+        }
     }
 
     public interface EventPassListener {

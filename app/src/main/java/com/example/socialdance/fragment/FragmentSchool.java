@@ -18,9 +18,11 @@ import android.widget.Toast;
 
 import com.example.socialdance.MainActivity;
 import com.example.socialdance.R;
+import com.example.socialdance.model.Dancer;
 import com.example.socialdance.model.EntityInfo;
 import com.example.socialdance.model.School;
 import com.example.socialdance.model.enums.Dances;
+import com.example.socialdance.retrofit.DancerApi;
 import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.retrofit.SchoolApi;
 
@@ -49,12 +51,15 @@ public class FragmentSchool extends Fragment {
     private Button bReviews;
 
     private SchoolApi schoolApi;
+    private DancerApi dancerApi;
 
     private School school;
+    private Dancer dancer;
 
     @Override
     public void onAttach(@NonNull Context context) {
         schoolApi = NetworkService.getInstance().getSchoolApi();
+        dancerApi = NetworkService.getInstance().getDancerApi();
         super.onAttach(context);
     }
 
@@ -84,6 +89,7 @@ public class FragmentSchool extends Fragment {
             @Override
             public void onResponse(Call<School> call, Response<School> response) {
                 school = response.body();
+                downloadDancer();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
                 fillForm();
             }
@@ -94,6 +100,23 @@ public class FragmentSchool extends Fragment {
                 Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
                 toast.show();
+            }
+        });
+    }
+
+    private void downloadDancer() {
+        dancerApi.getDancerById(school.getOwnerId()).enqueue(new Callback<Dancer>() {
+            @Override
+            public void onResponse(Call<Dancer> call, Response<Dancer> response) {
+                dancer = response.body();
+                if (dancer != null){
+                    tvOwner.setText(dancer.getName() + " " + dancer.getSurname());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Dancer> call, Throwable t) {
+
             }
         });
     }

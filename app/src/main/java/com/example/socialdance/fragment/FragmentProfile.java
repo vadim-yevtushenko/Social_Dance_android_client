@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,6 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -69,6 +73,7 @@ public class FragmentProfile extends Fragment {
         downloadDancer();
         createProfileRecyclerView();
         ivSave.setOnClickListener(this::save);
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -196,6 +201,27 @@ public class FragmentProfile extends Fragment {
     private void initViews(View view) {
         ivSave = view.findViewById(R.id.ivSave);
         rvProfile = view.findViewById(R.id.rvProfile);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.menu_about, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.itemAbout) {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+            alertDialog.setTitle("About the application");
+            alertDialog.setMessage("\nversion: 0.1");
+            alertDialog.setPositiveButton("OK", (dialog, which) -> {
+            });
+            alertDialog.show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public boolean isTeacher(){

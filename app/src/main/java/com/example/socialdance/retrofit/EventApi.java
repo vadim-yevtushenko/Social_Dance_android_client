@@ -16,6 +16,9 @@ public interface EventApi {
     @GET("events")
     Call<List<Event>> getAllEvents();
 
+    @GET("events/search/{city}")
+    Call<List<Event>> getAllEventsByCity(@Path("city") String city);
+
     @GET("events/owner/{id}")
     Call<List<Event>> getAllEventsByOwnerId(@Path("id") int id);
 

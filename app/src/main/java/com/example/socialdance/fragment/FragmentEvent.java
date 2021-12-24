@@ -17,10 +17,12 @@ import android.widget.Toast;
 
 import com.example.socialdance.MainActivity;
 import com.example.socialdance.R;
+import com.example.socialdance.model.Dancer;
 import com.example.socialdance.model.EntityInfo;
 import com.example.socialdance.model.Event;
 import com.example.socialdance.model.enums.Dances;
 import com.example.socialdance.repository.DataBaseInMemory;
+import com.example.socialdance.retrofit.DancerApi;
 import com.example.socialdance.retrofit.EventApi;
 import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.utils.DateTimeUtils;
@@ -48,12 +50,15 @@ public class FragmentEvent extends Fragment {
     private TextView tvEventDances;
 
     private Event event;
+    private Dancer dancer;
 
     private EventApi eventApi;
+    private DancerApi dancerApi;
 
     @Override
     public void onAttach(@NonNull Context context) {
         eventApi = NetworkService.getInstance().getEventApi();
+        dancerApi = NetworkService.getInstance().getDancerApi();
         super.onAttach(context);
     }
 
@@ -80,6 +85,7 @@ public class FragmentEvent extends Fragment {
             public void onResponse(Call<Event> call, Response<Event> response) {
 
                 event = response.body();
+                downloadDancer();
                 fillForm();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
             }
@@ -90,6 +96,23 @@ public class FragmentEvent extends Fragment {
                 Toast toast = Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG);
                 toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
                 toast.show();
+            }
+        });
+    }
+
+    private void downloadDancer() {
+        dancerApi.getDancerById(event.getOwnerId()).enqueue(new Callback<Dancer>() {
+            @Override
+            public void onResponse(Call<Dancer> call, Response<Dancer> response) {
+                dancer = response.body();
+                if (dancer != null){
+                    tvOwner.setText(dancer.getName() + " " + dancer.getSurname());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Dancer> call, Throwable t) {
+
             }
         });
     }

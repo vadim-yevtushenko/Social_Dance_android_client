@@ -92,7 +92,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
 
         setCheckBoxes(holder, position);
         if (entity instanceof Event) {
-            holder.tvRole.setText(EVENT);
+            holder.tvRole.setText(EVENT.toUpperCase());
             holder.tvDateShow.setText(DateTimeUtils.dateTimeFormat.format(((Event)entity).getDateEvent()));
             holder.tvDateToShow.setText(DateTimeUtils.dateTimeFormat.format(((Event)entity).getDateFinishEvent()));
 
@@ -176,7 +176,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
                 timePickerDialog.show();
             });
         } else {
-            holder.tvRole.setText(SCHOOL);
+            holder.tvRole.setText(SCHOOL.toUpperCase());
             holder.bDate.setVisibility(View.INVISIBLE);
             holder.bDateTo.setVisibility(View.INVISIBLE);
             holder.tvDateShow.setVisibility(View.INVISIBLE);

@@ -4,11 +4,15 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -62,6 +66,7 @@ public class FragmentProfileSignInOrReg extends Fragment {
         initViews(view);
         bSignIn.setOnClickListener(this::signIn);
         bSignUp.setOnClickListener(this::signUp);
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -75,11 +80,15 @@ public class FragmentProfileSignInOrReg extends Fragment {
                 if (checkReg == null || checkReg == 0){
                     if (etPasswordReg.getText().toString().equals(etPassRetype.getText().toString())) {
                         registrationDancerOnServer();
-                    } else {
+                    }else {
                         Toast toast = Toast.makeText(activity, "retype password is not correct", Toast.LENGTH_LONG);
                         toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
                         toast.show();
                     }
+                }else if (checkReg == -1){
+                    Toast toast = Toast.makeText(activity, "email is not valid", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
                 }else {
                     Toast toast = Toast.makeText(activity, "email is used", Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
@@ -165,6 +174,27 @@ public class FragmentProfileSignInOrReg extends Fragment {
         etPassRetype = view.findViewById(R.id.etPassRetype);
         bSignIn = view.findViewById(R.id.bSignIn);
         bSignUp = view.findViewById(R.id.bSignUp);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.menu_about, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.itemAbout) {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+            alertDialog.setTitle("About the application");
+            alertDialog.setMessage("\nversion: 0.1");
+            alertDialog.setPositiveButton("OK", (dialog, which) -> {
+            });
+            alertDialog.show();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     public interface ProfileSignInOrRegPassListener {

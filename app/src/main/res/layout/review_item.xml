@@ -10,7 +10,7 @@
 
     <TextView
         android:id="@+id/tvReview"
-        android:background="#EFEDED"
+        android:background="#8ED2FF"
         android:layout_width="330dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"

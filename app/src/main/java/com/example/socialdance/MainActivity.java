@@ -1,11 +1,17 @@
 package com.example.socialdance;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -305,13 +311,21 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
         fragmentReviewsAndRating.setArguments(bundle);
     }
 
-
-
     public void changeProfile(int id){
         editor = sharedPreferencesCheck.edit();
         editor.putInt(KEY_ID, id);
         editor.apply();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_search, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+
 
     public boolean isOnExit() {
         return onExit;

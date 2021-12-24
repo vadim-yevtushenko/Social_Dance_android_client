@@ -10,26 +10,28 @@
 
     <TextView
         android:id="@+id/tvName"
-        android:layout_width="215dp"
+        android:background="#FF7800"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:gravity="center"
         android:textSize="28sp"
+        android:textColor="@color/white"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.423"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvDescription"
-        android:layout_width="350dp"
+        android:layout_width="330dp"
         android:layout_height="50dp"
-        android:background="#EFEDED"
         android:layout_marginTop="20dp"
+        android:background="#8ED2FF"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.655"
+        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvName" />
 
@@ -41,7 +43,7 @@
         android:background="#EFEDED"
         android:text="date"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.522"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
 

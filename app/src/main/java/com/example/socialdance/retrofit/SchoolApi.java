@@ -1,6 +1,5 @@
 package com.example.socialdance.retrofit;
 
-import com.example.socialdance.R;
 import com.example.socialdance.model.Rating;
 import com.example.socialdance.model.Review;
 import com.example.socialdance.model.School;
@@ -18,6 +17,9 @@ public interface SchoolApi {
 
     @GET("schools")
     Call<List<School>> getAllSchools();
+
+    @GET("schools/search/{city}")
+    Call<List<School>> getAllSchoolsByCity(@Path("city") String city);
 
     @GET("schools/owner/{id}")
     Call<List<School>> getAllSchoolsByOwnerId(@Path("id")int id);

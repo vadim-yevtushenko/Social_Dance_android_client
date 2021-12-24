@@ -261,11 +261,11 @@
         android:id="@+id/bCreate"
         android:layout_width="150dp"
         android:layout_height="60dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="20dp"
         android:text="create school or event"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.111"
+        app:layout_constraintHorizontal_bias="0.125"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etDescription" />
 
@@ -273,26 +273,26 @@
         android:id="@+id/bSchoolAndEvents"
         android:layout_width="150dp"
         android:layout_height="60dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="20dp"
         android:text="my school and events"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.405"
         app:layout_constraintStart_toEndOf="@+id/bCreate"
         app:layout_constraintTop_toBottomOf="@+id/etDescription" />
 
     <Button
         android:id="@+id/bExit"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_marginTop="684dp"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
         android:background="#FF7800"
         android:text="exit"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.14"
+        app:layout_constraintHorizontal_bias="0.125"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.985" />
 
     <Button
         android:id="@+id/bDelete"
@@ -302,10 +302,10 @@
         android:text="delete profile"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.83"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.405"
+        app:layout_constraintStart_toEndOf="@+id/bExit"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintVertical_bias="0.985" />
 
     <EditText
         android:id="@+id/etPhone"
@@ -334,6 +334,15 @@
         app:layout_constraintHorizontal_bias="0.94"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etCity" />
+
+    <TextView
+        android:id="@+id/textView34"
+        android:layout_width="20dp"
+        android:layout_height="10dp"
+        android:layout_marginTop="720dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
