@@ -74,7 +74,9 @@ public class FragmentEventsList extends Fragment {
             @Override
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
                 eventsList.clear();
-                eventsList.addAll(response.body());
+                if (response.body() != null) {
+                    eventsList.addAll(response.body());
+                }
                 adapter.notifyDataSetChanged();
 
                 activity.getPbConnect().setVisibility(View.INVISIBLE);

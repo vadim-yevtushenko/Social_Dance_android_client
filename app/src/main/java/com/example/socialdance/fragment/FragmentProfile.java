@@ -83,7 +83,7 @@ public class FragmentProfile extends Fragment {
             @Override
             public void onResponse(Call<Dancer> call, Response<Dancer> response) {
                 dancer = response.body();
-                if (dancer.getId() == null){
+                if (dancer == null || dancer.getId() == null){
                     exitProfile();
                     return;
                 }

@@ -102,23 +102,25 @@ public class FragmentDancer extends Fragment {
     }
 
     private void fillForm() {
-        ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
-        tvDancerName.setText(dancer.getName());
-        tvDancerSurname.setText(dancer.getSurname());
-        tvDancerDescription.setText(dancer.getDescription());
-        if (dancer.getBirthday() != null) {
-            tvBirthday.setText(DateTimeUtils.dateFormat.format(dancer.getBirthday()));
-        }
-        tvSex.setText(dancer.getSex());
+        if (dancer != null) {
+            ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
+            tvDancerName.setText(dancer.getName());
+            tvDancerSurname.setText(dancer.getSurname());
+            tvDancerDescription.setText(dancer.getDescription());
+            if (dancer.getBirthday() != null) {
+                tvBirthday.setText(DateTimeUtils.dateFormat.format(dancer.getBirthday()));
+            }
+            tvSex.setText(dancer.getSex());
 
-        if (dancer.getRole() != null) {
-            tvDancerRole.setText(dancer.getRole().toString());
-        }
+            if (dancer.getRole() != null) {
+                tvDancerRole.setText(dancer.getRole().toString());
+            }
 
-        tvPhone.setText(dancer.getEntityInfo().getPhoneNumber());
-        tvEmail.setText(dancer.getEntityInfo().getEmail());
-        tvAddress.setText(getStringAddress(dancer.getEntityInfo()));
-        tvDances.setText(getStringListDances(dancer.getDances()));
+            tvPhone.setText(dancer.getEntityInfo().getPhoneNumber());
+            tvEmail.setText(dancer.getEntityInfo().getEmail());
+            tvAddress.setText(getStringAddress(dancer.getEntityInfo()));
+            tvDances.setText(getStringListDances(dancer.getDances()));
+        }
 
     }
 

@@ -76,7 +76,9 @@ public class FragmentSchoolsList extends Fragment {
             @Override
             public void onResponse(Call<List<School>> call, Response<List<School>> response) {
                 schoolsList.clear();
-                schoolsList.addAll(response.body());
+                if (response.body() != null) {
+                    schoolsList.addAll(response.body());
+                }
                 adapter.notifyDataSetChanged();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
             }

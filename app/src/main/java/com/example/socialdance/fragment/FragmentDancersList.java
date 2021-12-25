@@ -76,7 +76,9 @@ public class FragmentDancersList extends Fragment {
             @Override
             public void onResponse(Call<List<Dancer>> call, Response<List<Dancer>> response) {
                 dancersList.clear();
-                dancersList.addAll(response.body());
+                if (response.body() != null) {
+                    dancersList.addAll(response.body());
+                }
 
                 adapter.notifyDataSetChanged();
 
@@ -200,7 +202,9 @@ public class FragmentDancersList extends Fragment {
                     List<Dancer> dancersByCity = response.body();
                     activity.getPbConnect().setVisibility(View.INVISIBLE);
                     dancersList.clear();
-                    dancersList.addAll(dancersByCity);
+                    if (dancersByCity != null) {
+                        dancersList.addAll(dancersByCity);
+                    }
                     adapter.notifyDataSetChanged();
                 }
 

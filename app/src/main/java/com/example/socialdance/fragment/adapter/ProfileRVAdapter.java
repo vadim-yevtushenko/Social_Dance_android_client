@@ -92,7 +92,9 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     context,
                     (DatePickerDialog.OnDateSetListener) (view1, year, month, dayOfMonth) -> {
-                        holder.tvBirthdayShow.setText(dayOfMonth + "." + (month + 1) + "." + year);
+                        Integer m = (month + 1);
+                        String monthStr = String.valueOf(m).length() > 1 ? String.valueOf(m) : "0" + m;
+                        holder.tvBirthdayShow.setText(dayOfMonth + "." + (monthStr) + "." + year);
                         dancer.setBirthday(new GregorianCalendar(year, month, dayOfMonth).getTime());
                     },
                     calendar.get(Calendar.YEAR),

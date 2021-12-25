@@ -4,7 +4,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class NetworkService {
-    public static final String BASE_URL = "http://192.168.1.100:8080/";
+//    public static final String BASE_URL = "http://192.168.1.100:8080/";
+    public static final String BASE_URL = "https://social-dance.herokuapp.com/";
     private static NetworkService networkService;
     private Retrofit retrofit;
 

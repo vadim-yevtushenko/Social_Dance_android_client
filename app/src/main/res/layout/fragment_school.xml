@@ -56,21 +56,27 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    <TextView
-        android:id="@+id/tvSchoolName"
-        android:layout_width="266dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="TextView"
-        android:textSize="30sp"
-        android:textStyle="bold"
+    <ScrollView
+        android:layout_width="350dp"
+        android:layout_height="45dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-        app:layout_constraintVertical_bias="0.024" />
+        app:layout_constraintVertical_bias="0.012">
+
+        <TextView
+            android:id="@+id/tvSchoolName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="School"
+            android:textSize="30sp"
+            android:textStyle="bold"/>
+
+    </ScrollView>
+
 
 
     <TextView
@@ -142,7 +148,7 @@
         android:id="@+id/tvSchoolDances"
         android:layout_width="260dp"
         android:layout_height="wrap_content"
-        android:text="TextView"
+        android:text="|"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -156,7 +162,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Owner"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.128"
@@ -167,7 +173,7 @@
     <Button
         android:id="@+id/bReviews"
         android:background="#8ED2FF"
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="40dp"
         android:text="Reviews and Rating"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -218,7 +224,7 @@
         android:text="Description:"
         app:layout_constraintBottom_toTopOf="@+id/scrollView4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.056"
+        app:layout_constraintHorizontal_bias="0.03"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
         app:layout_constraintVertical_bias="0.981" />

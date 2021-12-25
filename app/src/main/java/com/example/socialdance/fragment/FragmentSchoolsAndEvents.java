@@ -80,7 +80,9 @@ public class FragmentSchoolsAndEvents extends Fragment {
                 List<School> schools = response.body();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
                 entityList.clear();
-                entityList.addAll(schools);
+                if (schools != null) {
+                    entityList.addAll(schools);
+                }
                 downloadEvents();
 //                schoolsAndEventsRVAdapter.notifyDataSetChanged();
             }
@@ -102,7 +104,9 @@ public class FragmentSchoolsAndEvents extends Fragment {
             public void onResponse(Call<List<Event>> call, Response<List<Event>> response) {
                 List<Event> events = response.body();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
-                entityList.addAll(events);
+                if (events != null) {
+                    entityList.addAll(events);
+                }
 
                 schoolsAndEventsRVAdapter.notifyDataSetChanged();
 

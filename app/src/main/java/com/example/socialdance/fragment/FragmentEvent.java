@@ -123,15 +123,17 @@ public class FragmentEvent extends Fragment {
 
     private void fillForm() {
 
-        tvEventName.setText(event.getName());
-        tvEventDescription.setText(event.getDescription());
-        tvEventAddress.setText(getStringAddress(event.getEntityInfo()));
-        if (event.getDateEvent() == null) {
-            tvDateTime.setText("soon");
-        } else {
-            tvDateTime.setText(getStringTime(event.getDateEvent(), event.getDateFinishEvent()));
+        if (event != null) {
+            tvEventName.setText(event.getName());
+            tvEventDescription.setText(event.getDescription());
+            tvEventAddress.setText(getStringAddress(event.getEntityInfo()));
+            if (event.getDateEvent() == null) {
+                tvDateTime.setText("soon");
+            } else {
+                tvDateTime.setText(getStringTime(event.getDateEvent(), event.getDateFinishEvent()));
+            }
+            tvEventDances.setText(getStringListDances(event.getDances()));
         }
-        tvEventDances.setText(getStringListDances(event.getDances()));
 
     }
 

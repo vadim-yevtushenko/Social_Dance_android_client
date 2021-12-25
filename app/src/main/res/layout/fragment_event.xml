@@ -57,21 +57,27 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <TextView
-        android:id="@+id/tvEventName"
-        android:layout_width="266dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:text="TextView"
-        android:textSize="30sp"
-        android:textStyle="bold"
+    <ScrollView
+        android:layout_width="350dp"
+        android:layout_height="45dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.491"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.012">
+
+        <TextView
+            android:id="@+id/tvEventName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Event"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+    </ScrollView>
+
+
 
     <TextView
         android:id="@+id/tvEventAddress"
@@ -103,7 +109,7 @@
         android:layout_width="260dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:text="TextView"
+        android:text="|"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -130,13 +136,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="organizer"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.031"
         app:layout_constraintStart_toEndOf="@+id/textView31"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
-        app:layout_constraintVertical_bias="0.356" />
+        app:layout_constraintVertical_bias="0.357" />
 
     <TextView
         android:id="@+id/textView11"
@@ -171,7 +177,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="dateTime"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.465"
@@ -208,9 +214,11 @@
         android:text="Description:"
         app:layout_constraintBottom_toTopOf="@+id/scrollView3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.077"
+        app:layout_constraintHorizontal_bias="0.03"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintLayout2"
         app:layout_constraintVertical_bias="0.984" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

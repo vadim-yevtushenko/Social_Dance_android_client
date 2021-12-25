@@ -312,8 +312,10 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     getActivity(),
                     (DatePickerDialog.OnDateSetListener) (view1, year, month, dayOfMonth) -> {
+                        Integer m = (month + 1);
+                        String monthStr = String.valueOf(m).length() > 1 ? String.valueOf(m) : "0" + m;
                         dateBuilder.append(dayOfMonth).
-                                append(".").append(month + 1).
+                                append(".").append(monthStr).
                                 append(".").append(year);
                         tvDateShow.setText(dateBuilder.toString() + timeBuilder.toString());
                         try {
@@ -351,8 +353,10 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
             DatePickerDialog datePickerDialog = new DatePickerDialog(
                     getActivity(),
                     (DatePickerDialog.OnDateSetListener) (view1, year, month, dayOfMonth) -> {
+                        Integer m = (month + 1);
+                        String monthStr = String.valueOf(m).length() > 1 ? String.valueOf(m) : "0" + m;
                         dateBuilder.append(dayOfMonth).
-                                append(".").append(month + 1).
+                                append(".").append(monthStr).
                                 append(".").append(year);
                         tvDateToShow.setText(dateBuilder.toString() + timeBuilder.toString());
                         try {
