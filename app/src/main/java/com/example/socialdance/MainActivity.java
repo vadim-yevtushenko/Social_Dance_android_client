@@ -1,20 +1,30 @@
 package com.example.socialdance;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.socialdance.fragment.FragmentCreateSchoolOrEvent;
 import com.example.socialdance.fragment.FragmentDancer;
@@ -27,14 +37,15 @@ import com.example.socialdance.fragment.FragmentReviewsAndRating;
 import com.example.socialdance.fragment.FragmentSchool;
 import com.example.socialdance.fragment.FragmentSchoolsAndEvents;
 import com.example.socialdance.fragment.FragmentSchoolsList;
-import com.example.socialdance.model.enums.Role;
+import com.example.socialdance.fragment.ImagePassListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements FragmentDancersList.DancerPassListener,
         FragmentEventsList.EventPassListener, FragmentSchoolsList.SchoolPassListener,
-        FragmentProfileSignInOrReg.ProfileSignInOrRegPassListener, FragmentSchool.SchoolForReviewPassListener {
+        FragmentProfileSignInOrReg.ProfileSignInOrRegPassListener,
+        FragmentSchool.SchoolForReviewPassListener, ImagePassListener {
 
     private TextView tvEvent;
     private TextView tvSchool;
@@ -60,8 +71,10 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
     private String PREF_REG = "reg";
     private String PREF_CHECKER = "checker";
     public final static int TOAST_Y_GRAVITY = 500;
+    private static final int REQUEST_CODE_GALLERY_ACTIVITY = 1;
 
     private List<TextView> tabs;
+    private Uri image;
 
     private boolean onExit;
     private boolean isEntered;
@@ -75,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        Log.d("log", "onCreate " );
         tabs = new ArrayList<>();
         initViews();
         pbConnect.setVisibility(View.INVISIBLE);
@@ -325,6 +339,61 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
         return super.onCreateOptionsMenu(menu);
     }
 
+    @Override
+    public Uri uploadPicture() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED) {
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            intent.setType("image/*");
+            startActivityForResult(intent, REQUEST_CODE_GALLERY_ACTIVITY);
+        } else {
+            requestStoragePermission();
+        }
+        return image;
+    }
+
+    private void requestStoragePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_EXTERNAL_STORAGE)){
+            new AlertDialog.Builder(this)
+                    .setTitle("Permission needed")
+                    .setMessage("This permission is needed")
+                    .setPositiveButton("OK", (dialog, which) -> ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_GALLERY_ACTIVITY))
+                    .setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss())
+                    .create().show();
+        }else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_GALLERY_ACTIVITY);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_GALLERY_ACTIVITY) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast toast = Toast.makeText(this, "Permission GRANTED", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
+            } else {
+                Toast toast = Toast.makeText(this, "Permission DENIED", Toast.LENGTH_LONG);
+                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                toast.show();
+            }
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_GALLERY_ACTIVITY) {
+            if (resultCode == RESULT_OK && data != null) {
+                image = data.getData();
+                Log.d("log", "onActivityResult " + image);
+            }
+        }
+    }
+
 
 
     public boolean isOnExit() {
@@ -349,5 +418,13 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
 
     public ProgressBar getPbConnect() {
         return pbConnect;
+    }
+
+    public Uri getImage() {
+        return image;
+    }
+
+    public void setImage(Uri image) {
+        this.image = image;
     }
 }

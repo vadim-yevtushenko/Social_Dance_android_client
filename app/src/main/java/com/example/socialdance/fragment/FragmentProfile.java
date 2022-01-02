@@ -1,6 +1,8 @@
 package com.example.socialdance.fragment;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -9,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,6 +20,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -30,10 +34,14 @@ import com.example.socialdance.retrofit.DancerApi;
 import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.utils.DateTimeUtils;
 
+import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -51,6 +59,7 @@ public class FragmentProfile extends Fragment {
     private Dancer dancer;
     private int id;
 
+    private ImagePassListener imagePassListener;
     private MainActivity activity;
     private DancerApi dancerApi;
 
@@ -65,6 +74,7 @@ public class FragmentProfile extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         activity = (MainActivity) getActivity();
+        imagePassListener = activity;
         initViews(view);
         if (getArguments() != null){
             id = getArguments().getInt(MainActivity.KEY_ID);
@@ -114,6 +124,7 @@ public class FragmentProfile extends Fragment {
         dancerApi.updateDancer(dancer).enqueue(new Callback<Dancer>() {
             @Override
             public void onResponse(Call<Dancer> call, Response<Dancer> response) {
+
                 dancer = response.body();
                 if (dancer != null){
                     dancerList.clear();
@@ -196,6 +207,56 @@ public class FragmentProfile extends Fragment {
         linearLayoutManager = new LinearLayoutManager(getActivity());
         rvProfile.setLayoutManager(linearLayoutManager);
         rvProfile.setAdapter(profileRVAdapter);
+    }
+
+    public void setAvatar(){
+        Button button = new Button(activity);
+        button.setText("Open gallery");
+        button.setOnClickListener(v1 -> {
+            imagePassListener.uploadPicture();
+        });
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity).
+                setTitle("\t\t\t\t\t\tSet the avatar!").
+                setView(button).
+                setPositiveButton("OK", (dialog, which) -> {
+                    if (activity.getImage() != null) {
+                        profileRVAdapter.notifyDataSetChanged();
+                        File avatar = new File(getPath(activity.getImage()));
+                        Log.d("log", "file " + avatar.toString());
+                        RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), avatar);
+                        MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("img", avatar.getName(), requestBody);
+                        dancerApi.uploadFile(fileToUpload).enqueue(new Callback<String>() {
+                            @Override
+                            public void onResponse(Call<String> call, Response<String> response) {
+                                Log.d("log", "onResponse " + response.body());
+                            }
+
+                            @Override
+                            public void onFailure(Call<String> call, Throwable t) {
+                                Log.d("log", "onFailure " + t.toString());
+                            }
+                        });
+                    }
+                }).
+                setNegativeButton("DELETE", (dialog, which) -> {
+                    activity.setImage(null);
+                    profileRVAdapter.notifyDataSetChanged();
+                }).
+                setNeutralButton("CANCEL", (dialog, which) -> {
+                });
+        alertDialog.show();
+    }
+
+    public String getPath(Uri uri)
+    {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
+        if (cursor == null) return null;
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String s=cursor.getString(column_index);
+        cursor.close();
+        return s;
     }
 
     private void initViews(View view) {

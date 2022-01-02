@@ -2,7 +2,6 @@ package com.example.socialdance.fragment.adapter;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,15 +65,24 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Role.values());
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.profile_item, parent, false);
-        ProfileRecyclerViewHolder viewHolder = new ProfileRecyclerViewHolder(view);
-        return viewHolder;
+
+        return new ProfileRecyclerViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ProfileRVAdapter.ProfileRecyclerViewHolder holder, int position) {
         Dancer dancer = dancerList.get(position);
         this.holderGlobal = holder;
-        holder.ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
+        holder.ivAvatar.setOnClickListener(v -> fragmentProfile.setAvatar());
+
+        if (activity.getImage() == null) {
+            holder.ctvAvatar.setVisibility(View.VISIBLE);
+            holder.ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
+        }else {
+            holder.ctvAvatar.setVisibility(View.INVISIBLE);
+            holder.ivAvatar.setImageURI(activity.getImage());
+        }
+
         holder.spRole.setAdapter(spinnerAdapter);
         if (dancerList.size() > 0){
             holder.etName.setText(dancer.getName());
@@ -123,24 +131,16 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
 
         setCheckBoxes(holder, position);
 
-        holder.bCreate.setOnClickListener(v -> {
-            activity.setFragmentCreateSchoolOrEvent();
-        });
-        holder.bSchoolAndEvents.setOnClickListener(v -> {
-            activity.setFragmentSchoolsAndEvents();
-        });
+        holder.bCreate.setOnClickListener(v -> activity.setFragmentCreateSchoolOrEvent());
+        holder.bSchoolAndEvents.setOnClickListener(v -> activity.setFragmentSchoolsAndEvents());
 
-        holder.bExit.setOnClickListener(v -> {
-            fragmentProfile.exitProfile();
-        });
+        holder.bExit.setOnClickListener(v -> fragmentProfile.exitProfile());
 
         holder.bDelete.setOnClickListener(v -> {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity).
                     setTitle("Your profile will be deleted!").
                     setMessage("Do you want delete your profile?").
-                    setPositiveButton("YES", (dialog, which) -> {
-                        deleteDancer(dancer.getId());
-                    }).
+                    setPositiveButton("YES", (dialog, which) -> deleteDancer(dancer.getId())).
                     setNeutralButton("CANCEL", (dialog, which) -> {
                     });
             alertDialog.show();
@@ -157,9 +157,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             }
         });
 
-        holder.bSchoolAndEvents.setOnClickListener(v -> {
-            activity.setFragmentSchoolsAndEvents();
-        });
+        holder.bSchoolAndEvents.setOnClickListener(v -> activity.setFragmentSchoolsAndEvents());
     }
 
     public void deleteDancer(int id){
@@ -167,7 +165,6 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         fragmentProfile.getDancerApi().deleteDancer(id).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
-                response.body();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
                 fragmentProfile.exitProfile();
                 Toast toast = Toast.makeText(activity, "DELETED", Toast.LENGTH_LONG);
@@ -400,4 +397,5 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
     public ProfileRecyclerViewHolder getHolderGlobal() {
         return holderGlobal;
     }
+
 }
