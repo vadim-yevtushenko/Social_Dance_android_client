@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class NetworkService {
     public static final String BASE_URL = "http://192.168.1.100:8080/";
@@ -20,6 +21,7 @@ public class NetworkService {
 
         retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
+                .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
     }

@@ -223,12 +223,13 @@ public class FragmentProfile extends Fragment {
                         profileRVAdapter.notifyDataSetChanged();
                         File avatar = new File(getPath(activity.getImage()));
                         Log.d("log", "file " + avatar.toString());
-                        RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), avatar);
-                        MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("img", avatar.getName(), requestBody);
+                        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), avatar);
+                        MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", avatar.getName(), requestBody);
                         dancerApi.uploadFile(fileToUpload).enqueue(new Callback<String>() {
                             @Override
                             public void onResponse(Call<String> call, Response<String> response) {
-                                Log.d("log", "onResponse " + response.body());
+                                String body = response.body();
+                                Log.d("log", "onResponse " + body);
                             }
 
                             @Override
