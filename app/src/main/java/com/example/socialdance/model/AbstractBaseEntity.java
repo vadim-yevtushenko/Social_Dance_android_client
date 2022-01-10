@@ -8,7 +8,7 @@ import java.util.Set;
 public abstract class AbstractBaseEntity {
 
     private Integer id;
-//    private boolean avatar;
+    private String image;
     private String name;
     private String description;
     private EntityInfo entityInfo;
@@ -18,7 +18,8 @@ public abstract class AbstractBaseEntity {
     public AbstractBaseEntity() {
     }
 
-    public AbstractBaseEntity(String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances) {
+    public AbstractBaseEntity(String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances) {
+        this.image = image;
         this.name = name;
         this.description = description;
         this.entityInfo = entityInfo;
@@ -26,8 +27,9 @@ public abstract class AbstractBaseEntity {
         this.dances = dances;
     }
 
-    public AbstractBaseEntity(Integer id, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances) {
+    public AbstractBaseEntity(Integer id, String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances) {
         this.id = id;
+        this.image = image;
         this.name = name;
         this.description = description;
         this.entityInfo = entityInfo;
@@ -41,6 +43,14 @@ public abstract class AbstractBaseEntity {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getName() {

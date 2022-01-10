@@ -15,14 +15,14 @@ public class School extends AbstractBaseEntity{
     public School() {
     }
 
-    public School(String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, List<String> reviews) {
-        super(name, description, entityInfo, rating, dances);
+    public School(String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, List<String> reviews) {
+        super(image, name, description, entityInfo, rating, dances);
         this.ownerId = ownerId;
         this.reviews = reviews;
     }
 
-    public School(Integer id, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, List<String> reviews) {
-        super(id, name, description, entityInfo, rating, dances);
+    public School(Integer id, String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, List<String> reviews) {
+        super(id, image, name, description, entityInfo, rating, dances);
         this.ownerId = ownerId;
         this.reviews = reviews;
     }
@@ -34,9 +34,7 @@ public class School extends AbstractBaseEntity{
         return reviews;
     }
 
-//    public void setReviews(List<String> reviews) {
-//        this.reviews = reviews;
-//    }
+
 
     public int getOwnerId() {
         return ownerId;

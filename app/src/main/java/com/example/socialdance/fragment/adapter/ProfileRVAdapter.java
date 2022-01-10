@@ -2,6 +2,9 @@ package com.example.socialdance.fragment.adapter;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,11 +33,13 @@ import com.example.socialdance.model.enums.Role;
 import com.example.socialdance.utils.CircleTextView;
 import com.example.socialdance.utils.DateTimeUtils;
 
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -49,7 +54,6 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
     private ArrayAdapter<Role> spinnerAdapter;
     private MainActivity activity;
     private ProfileRecyclerViewHolder holderGlobal;
-
 
 
     public ProfileRVAdapter(List<Dancer> dancerList, FragmentProfile fragmentProfile) {
@@ -75,16 +79,30 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         this.holderGlobal = holder;
         holder.ivAvatar.setOnClickListener(v -> fragmentProfile.setAvatar());
 
-        if (activity.getImage() == null) {
-            holder.ctvAvatar.setVisibility(View.VISIBLE);
-            holder.ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
-        }else {
-            holder.ctvAvatar.setVisibility(View.INVISIBLE);
-            holder.ivAvatar.setImageURI(activity.getImage());
-        }
+        holder.ctvAvatar.setVisibility(View.VISIBLE);
+        holder.ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
+
+        fragmentProfile.getDancerApi().downloadImage(dancer.getId()).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+
+                InputStream inputStream = response.body().byteStream();
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                if (bitmap != null) {
+                    holder.ctvAvatar.setVisibility(View.INVISIBLE);
+                    holder.ivAvatar.setImageBitmap(bitmap);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+            }
+        });
 
         holder.spRole.setAdapter(spinnerAdapter);
-        if (dancerList.size() > 0){
+        if (dancerList.size() > 0) {
             holder.etName.setText(dancer.getName());
             holder.etSurname.setText(dancer.getSurname());
             holder.etDescription.setText(dancer.getDescription());
@@ -117,9 +135,9 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         holder.etCity.setText(dancer.getEntityInfo().getCity());
         holder.etPhone.setText(dancer.getEntityInfo().getPhoneNumber());
         holder.etEmail.setText(dancer.getEntityInfo().getEmail());
-        if (dancer.getSex() == null || dancer.getSex().equals("male")){
+        if (dancer.getSex() == null || dancer.getSex().equals("male")) {
             holder.rbMale.setChecked(true);
-        }else {
+        } else {
             holder.rbFemale.setChecked(true);
         }
 
@@ -160,7 +178,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         holder.bSchoolAndEvents.setOnClickListener(v -> activity.setFragmentSchoolsAndEvents());
     }
 
-    public void deleteDancer(int id){
+    public void deleteDancer(int id) {
         activity.getPbConnect().setVisibility(View.VISIBLE);
         fragmentProfile.getDancerApi().deleteDancer(id).enqueue(new Callback<Void>() {
             @Override
@@ -185,7 +203,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
 
     private String getCharsForAvatar(String name, String surname) {
         String firstChar = String.valueOf(name.charAt(0)).toUpperCase();
-        if (surname == null || surname.equals("")){
+        if (surname == null || surname.equals("")) {
             return firstChar;
         }
         return firstChar + String.valueOf(surname.charAt(0)).toUpperCase();
@@ -230,7 +248,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         return dancerList.size();
     }
 
-    public class ProfileRecyclerViewHolder extends RecyclerView.ViewHolder{
+    public class ProfileRecyclerViewHolder extends RecyclerView.ViewHolder {
 
         private EditText etName;
         private EditText etSurname;

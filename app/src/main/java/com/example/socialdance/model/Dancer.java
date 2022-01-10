@@ -8,7 +8,6 @@ import java.util.List;
 
 public class Dancer extends AbstractBaseEntity{
 
-    private String avatar;
     private String surname;
     private String sex;
     private Date birthday;
@@ -19,29 +18,22 @@ public class Dancer extends AbstractBaseEntity{
         this.role = Role.DANCER;
     }
 
-    public Dancer(String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, String surname, String sex, Date birthday, Role role) {
-        super(name, description, entityInfo, rating, dances);
+    public Dancer(String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, String surname, String sex, Date birthday, Role role) {
+        super(image, name, description, entityInfo, rating, dances);
         this.surname = surname;
         this.sex = sex;
         this.birthday = birthday;
         this.role = role;
     }
 
-    public Dancer(Integer id, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, String surname, String sex, Date birthday, Role role) {
-        super(id, name, description, entityInfo, rating, dances);
+    public Dancer(Integer id, String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, String surname, String sex, Date birthday, Role role) {
+        super(id, image, name, description, entityInfo, rating, dances);
         this.surname = surname;
         this.sex = sex;
         this.birthday = birthday;
         this.role = role;
     }
 
-    public String getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
 
     public String getSurname() {
         if (surname == null){

@@ -17,16 +17,16 @@ public class Event extends AbstractBaseEntity{
     public Event() {
     }
 
-    public Event(String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, Date dateEvent, Date dateFinishEvent, Date datePublication) {
-        super(name, description, entityInfo, rating, dances);
+    public Event(String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, Date dateEvent, Date dateFinishEvent, Date datePublication) {
+        super(image, name, description, entityInfo, rating, dances);
         this.ownerId = ownerId;
         this.dateEvent = dateEvent;
         this.dateFinishEvent = dateFinishEvent;
         this.datePublication = datePublication;
     }
 
-    public Event(Integer id, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, Date dateEvent, Date dateFinishEvent, Date datePublication) {
-        super(id, name, description, entityInfo, rating, dances);
+    public Event(Integer id, String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, Date dateEvent, Date dateFinishEvent, Date datePublication) {
+        super(id, image, name, description, entityInfo, rating, dances);
         this.ownerId = ownerId;
         this.dateEvent = dateEvent;
         this.dateFinishEvent = dateFinishEvent;

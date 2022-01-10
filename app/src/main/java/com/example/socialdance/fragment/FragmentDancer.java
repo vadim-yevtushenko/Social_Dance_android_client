@@ -1,6 +1,8 @@
 package com.example.socialdance.fragment;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -25,8 +27,10 @@ import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.utils.CircleTextView;
 import com.example.socialdance.utils.DateTimeUtils;
 
+import java.io.InputStream;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,6 +41,7 @@ import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
 public class FragmentDancer extends Fragment {
 
     private CircleTextView ctvAvatar;
+    private ImageView ivAvatar;
     private TextView tvDancerName;
     private TextView tvDancerSurname;
     private TextView tvDancerDescription;
@@ -103,7 +108,26 @@ public class FragmentDancer extends Fragment {
 
     private void fillForm() {
         if (dancer != null) {
-            ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
+            if (dancer.getImage() == null) {
+                ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
+            }else {
+                dancerApi.downloadImage(dancer.getId()).enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        InputStream inputStream = response.body().byteStream();
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap != null) {
+                            ctvAvatar.setVisibility(View.INVISIBLE);
+                            ivAvatar.setImageBitmap(bitmap);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
+            }
             tvDancerName.setText(dancer.getName());
             tvDancerSurname.setText(dancer.getSurname());
             tvDancerDescription.setText(dancer.getDescription());
@@ -146,6 +170,7 @@ public class FragmentDancer extends Fragment {
 
     private void initViews(View view) {
         ctvAvatar = view.findViewById(R.id.ctvAvatar);
+        ivAvatar = view.findViewById(R.id.ivAvatar);
         tvDancerName = view.findViewById(R.id.tvDancerName);
         tvDancerSurname = view.findViewById(R.id.tvDancerSurname);
         tvDancerDescription = view.findViewById(R.id.tvDancerDescription);

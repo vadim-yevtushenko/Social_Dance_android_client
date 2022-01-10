@@ -2,6 +2,8 @@ package com.example.socialdance.fragment;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -34,6 +36,7 @@ import com.example.socialdance.retrofit.DancerApi;
 import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.utils.DateTimeUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -154,6 +157,7 @@ public class FragmentProfile extends Fragment {
     private void createDancerForSave() {
 
         ProfileRVAdapter.ProfileRecyclerViewHolder holder = profileRVAdapter.getHolderGlobal();
+
         dancer.setName(holder.getEtName().getText().toString());
         dancer.setSurname(holder.getEtSurname().getText().toString());
         dancer.setDescription(holder.getEtDescription().getText().toString());
@@ -221,15 +225,16 @@ public class FragmentProfile extends Fragment {
                 setPositiveButton("OK", (dialog, which) -> {
                     if (activity.getImage() != null) {
                         profileRVAdapter.notifyDataSetChanged();
-                        File avatar = new File(getPath(activity.getImage()));
-                        Log.d("log", "file " + avatar.toString());
-                        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), avatar);
-                        MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", avatar.getName(), requestBody);
-                        dancerApi.uploadFile(fileToUpload).enqueue(new Callback<String>() {
+                        File image = new File(getPath(activity.getImage()));
+                        byte[] byteArray = getCompressImage(getPath(activity.getImage()));
+                        RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), byteArray);
+                        MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", image.getName(), requestBody);
+                        dancerApi.uploadImage(id, fileToUpload).enqueue(new Callback<String>() {
                             @Override
                             public void onResponse(Call<String> call, Response<String> response) {
                                 String body = response.body();
                                 Log.d("log", "onResponse " + body);
+                                profileRVAdapter.notifyDataSetChanged();
                             }
 
                             @Override
@@ -246,6 +251,13 @@ public class FragmentProfile extends Fragment {
                 setNeutralButton("CANCEL", (dialog, which) -> {
                 });
         alertDialog.show();
+    }
+
+    private byte[] getCompressImage(String path) {
+        Bitmap bitmap = BitmapFactory.decodeFile(path);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 30, stream);
+        return stream.toByteArray();
     }
 
     public String getPath(Uri uri)

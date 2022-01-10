@@ -1,9 +1,12 @@
 package com.example.socialdance.fragment.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -13,18 +16,28 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.socialdance.R;
 import com.example.socialdance.model.Dancer;
 import com.example.socialdance.fragment.FragmentDancersList;
+import com.example.socialdance.retrofit.DancerApi;
+import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.utils.CircleTextView;
 
+import java.io.InputStream;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DancerRVAdapter extends RecyclerView.Adapter<DancerRVAdapter.DancerRecyclerViewHolder> {
 
     private Context context;
     private List<Dancer> dancers;
     private FragmentDancersList.DancerPassListener dancerPassListener;
+    private DancerApi dancerApi;
 
     public DancerRVAdapter(List<Dancer> dancers) {
         this.dancers = dancers;
+        dancerApi = NetworkService.getInstance().getDancerApi();
     }
 
     @NonNull
@@ -40,13 +53,32 @@ public class DancerRVAdapter extends RecyclerView.Adapter<DancerRVAdapter.Dancer
 
     @Override
     public void onBindViewHolder(@NonNull DancerRVAdapter.DancerRecyclerViewHolder holder, int position) {
+        Dancer dancer = dancers.get(position);
+        if (dancer.getImage() == null) {
+            holder.ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
+        } else {
+            dancerApi.downloadImage(dancer.getId()).enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    InputStream inputStream = response.body().byteStream();
+                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                    if (bitmap != null) {
+                        holder.ctvAvatar.setVisibility(View.INVISIBLE);
+                        holder.ivAvatar.setImageBitmap(bitmap);
+                    }
+                }
 
-        holder.ctvAvatar.setText(getCharsForAvatar(dancers.get(position).getName(), dancers.get(position).getSurname()));
-        holder.tvName.setText(dancers.get(position).getName());
-        holder.tvSurname.setText(dancers.get(position).getSurname());
-        holder.tvDancerCity.setText(dancers.get(position).getEntityInfo().getCity());
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                }
+            });
+        }
+        holder.tvName.setText(dancer.getName());
+        holder.tvSurname.setText(dancer.getSurname());
+        holder.tvDancerCity.setText(dancer.getEntityInfo().getCity());
         holder.dancerItemLayout.setOnClickListener(v -> {
-            dancerPassListener.passDancerId(dancers.get(position).getId());
+            dancerPassListener.passDancerId(dancer.getId());
         });
     }
 
@@ -70,6 +102,7 @@ public class DancerRVAdapter extends RecyclerView.Adapter<DancerRVAdapter.Dancer
         private TextView tvSurname;
         private TextView tvDancerCity;
         private CircleTextView ctvAvatar;
+        private ImageView ivAvatar;
 
         public DancerRecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -78,6 +111,7 @@ public class DancerRVAdapter extends RecyclerView.Adapter<DancerRVAdapter.Dancer
             tvSurname = itemView.findViewById(R.id.tvSurname);
             tvDancerCity = itemView.findViewById(R.id.tvDancerCity);
             ctvAvatar = itemView.findViewById(R.id.ctvAvatar);
+            ivAvatar = itemView.findViewById(R.id.ivAvatar);
         }
     }
 }

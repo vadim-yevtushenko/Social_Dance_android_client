@@ -8,6 +8,7 @@ import com.example.socialdance.model.Dancer;
 import java.util.List;
 
 import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
@@ -40,8 +41,11 @@ public interface DancerApi {
     Call<Dancer> updateDancer(@Body Dancer dancer);
 
     @Multipart
-    @POST("dancers/upload-file")
-    Call<String> uploadFile(@Part MultipartBody.Part avatar);
+    @POST("dancers/upload-image")
+    Call<String> uploadImage(@Query("id") Integer id, @Part MultipartBody.Part image);
+
+    @GET("dancers/download-image")
+    public Call<ResponseBody> downloadImage (@Query("id") Integer id);
 
     @DELETE("dancers/{id}")
     Call<Void> deleteDancer(@Path("id") Integer id);
