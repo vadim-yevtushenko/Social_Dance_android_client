@@ -108,9 +108,9 @@ public class FragmentDancer extends Fragment {
 
     private void fillForm() {
         if (dancer != null) {
-            if (dancer.getImage() == null) {
-                ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
-            }else {
+            ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
+            if (dancer.getImage() != null) {
+
                 dancerApi.downloadImage(dancer.getId()).enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

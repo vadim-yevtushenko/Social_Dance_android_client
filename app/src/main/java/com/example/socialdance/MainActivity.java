@@ -389,7 +389,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDancersLi
         if (requestCode == REQUEST_CODE_GALLERY_ACTIVITY) {
             if (resultCode == RESULT_OK && data != null) {
                 image = data.getData();
-                Log.d("log", "onActivityResult " + image);
             }
         }
     }

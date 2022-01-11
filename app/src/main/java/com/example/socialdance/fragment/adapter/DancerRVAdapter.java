@@ -54,9 +54,9 @@ public class DancerRVAdapter extends RecyclerView.Adapter<DancerRVAdapter.Dancer
     @Override
     public void onBindViewHolder(@NonNull DancerRVAdapter.DancerRecyclerViewHolder holder, int position) {
         Dancer dancer = dancers.get(position);
-        if (dancer.getImage() == null) {
-            holder.ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
-        } else {
+        holder.ctvAvatar.setText(getCharsForAvatar(dancer.getName(), dancer.getSurname()));
+        if (dancer.getImage() != null) {
+
             dancerApi.downloadImage(dancer.getId()).enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
