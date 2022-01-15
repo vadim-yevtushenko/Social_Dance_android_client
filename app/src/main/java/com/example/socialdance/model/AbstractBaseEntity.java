@@ -12,13 +12,13 @@ public abstract class AbstractBaseEntity {
     private String name;
     private String description;
     private EntityInfo entityInfo;
-    private String rating;
+    private AverageRating rating;
     private List<Dances> dances;
 
     public AbstractBaseEntity() {
     }
 
-    public AbstractBaseEntity(String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances) {
+    public AbstractBaseEntity(String image, String name, String description, EntityInfo entityInfo, AverageRating rating, List<Dances> dances) {
         this.image = image;
         this.name = name;
         this.description = description;
@@ -27,7 +27,7 @@ public abstract class AbstractBaseEntity {
         this.dances = dances;
     }
 
-    public AbstractBaseEntity(Integer id, String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances) {
+    public AbstractBaseEntity(Integer id, String image, String name, String description, EntityInfo entityInfo, AverageRating rating, List<Dances> dances) {
         this.id = id;
         this.image = image;
         this.name = name;
@@ -72,11 +72,11 @@ public abstract class AbstractBaseEntity {
         this.description = description;
     }
 
-    public String getRating() {
+    public AverageRating getRating() {
         return rating;
     }
 
-    public void setRating(String rating) {
+    public void setRating(AverageRating rating) {
         this.rating = rating;
     }
 

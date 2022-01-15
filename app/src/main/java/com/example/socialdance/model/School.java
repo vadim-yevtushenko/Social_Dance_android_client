@@ -15,13 +15,13 @@ public class School extends AbstractBaseEntity{
     public School() {
     }
 
-    public School(String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, List<String> reviews) {
+    public School(String image, String name, String description, EntityInfo entityInfo, AverageRating rating, List<Dances> dances, int ownerId, List<String> reviews) {
         super(image, name, description, entityInfo, rating, dances);
         this.ownerId = ownerId;
         this.reviews = reviews;
     }
 
-    public School(Integer id, String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, List<String> reviews) {
+    public School(Integer id, String image, String name, String description, EntityInfo entityInfo, AverageRating rating, List<Dances> dances, int ownerId, List<String> reviews) {
         super(id, image, name, description, entityInfo, rating, dances);
         this.ownerId = ownerId;
         this.reviews = reviews;

@@ -5,6 +5,8 @@ import java.util.Date;
 public class Review {
     private int id;
 
+    private Boolean incognito;
+
     private int abstractBaseEntityId;
 
     private int schoolId;
@@ -16,11 +18,12 @@ public class Review {
     public Review() {
     }
 
-    public Review(int abstractBaseEntityId, int school, String review, Date dateTime) {
+    public Review(Boolean incognito, int abstractBaseEntityId, int schoolId, String review, Date dateTime) {
+        this.incognito = incognito;
         this.abstractBaseEntityId = abstractBaseEntityId;
-        this.schoolId = school;
-        this.dateTime = dateTime;
+        this.schoolId = schoolId;
         this.review = review;
+        this.dateTime = dateTime;
     }
 
     public int getId() {
@@ -29,6 +32,14 @@ public class Review {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Boolean isIncognito() {
+        return incognito;
+    }
+
+    public void setIncognito(Boolean incognito) {
+        this.incognito = incognito;
     }
 
     public int getAbstractBaseEntityId() {
@@ -67,7 +78,8 @@ public class Review {
     public String toString() {
         return "Review{" +
                 "id=" + id +
-                ", abstractBaseEntityId=" + abstractBaseEntityId +
+                ", isIncognito=" + incognito +
+                ", ownerId=" + abstractBaseEntityId +
                 ", schoolId=" + schoolId +
                 ", review='" + review + '\'' +
                 ", dateTime=" + dateTime +

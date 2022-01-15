@@ -17,7 +17,7 @@ public class Event extends AbstractBaseEntity{
     public Event() {
     }
 
-    public Event(String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, Date dateEvent, Date dateFinishEvent, Date datePublication) {
+    public Event(String image, String name, String description, EntityInfo entityInfo, AverageRating rating, List<Dances> dances, int ownerId, Date dateEvent, Date dateFinishEvent, Date datePublication) {
         super(image, name, description, entityInfo, rating, dances);
         this.ownerId = ownerId;
         this.dateEvent = dateEvent;
@@ -25,7 +25,7 @@ public class Event extends AbstractBaseEntity{
         this.datePublication = datePublication;
     }
 
-    public Event(Integer id, String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, int ownerId, Date dateEvent, Date dateFinishEvent, Date datePublication) {
+    public Event(Integer id, String image, String name, String description, EntityInfo entityInfo, AverageRating rating, List<Dances> dances, int ownerId, Date dateEvent, Date dateFinishEvent, Date datePublication) {
         super(id, image, name, description, entityInfo, rating, dances);
         this.ownerId = ownerId;
         this.dateEvent = dateEvent;

@@ -18,7 +18,7 @@ public class Dancer extends AbstractBaseEntity{
         this.role = Role.DANCER;
     }
 
-    public Dancer(String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, String surname, String sex, Date birthday, Role role) {
+    public Dancer(String image, String name, String description, EntityInfo entityInfo, AverageRating rating, List<Dances> dances, String surname, String sex, Date birthday, Role role) {
         super(image, name, description, entityInfo, rating, dances);
         this.surname = surname;
         this.sex = sex;
@@ -26,7 +26,7 @@ public class Dancer extends AbstractBaseEntity{
         this.role = role;
     }
 
-    public Dancer(Integer id, String image, String name, String description, EntityInfo entityInfo, String rating, List<Dances> dances, String surname, String sex, Date birthday, Role role) {
+    public Dancer(Integer id, String image, String name, String description, EntityInfo entityInfo, AverageRating rating, List<Dances> dances, String surname, String sex, Date birthday, Role role) {
         super(id, image, name, description, entityInfo, rating, dances);
         this.surname = surname;
         this.sex = sex;

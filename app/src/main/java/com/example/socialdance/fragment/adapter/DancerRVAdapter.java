@@ -60,11 +60,13 @@ public class DancerRVAdapter extends RecyclerView.Adapter<DancerRVAdapter.Dancer
             dancerApi.downloadImage(dancer.getId()).enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    InputStream inputStream = response.body().byteStream();
-                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                    if (bitmap != null) {
-                        holder.ctvAvatar.setVisibility(View.INVISIBLE);
-                        holder.ivAvatar.setImageBitmap(bitmap);
+                    if (response.body() != null) {
+                        InputStream inputStream = response.body().byteStream();
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap != null) {
+                            holder.ctvAvatar.setVisibility(View.INVISIBLE);
+                            holder.ivAvatar.setImageBitmap(bitmap);
+                        }
                     }
                 }
 

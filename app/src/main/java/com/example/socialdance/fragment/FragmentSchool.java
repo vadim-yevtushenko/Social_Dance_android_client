@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +50,7 @@ public class FragmentSchool extends Fragment {
     private TextView tvSchoolDances;
     private TextView tvOwner;
     private Button bReviews;
+    private RatingBar ratingBar;
 
     private SchoolApi schoolApi;
     private DancerApi dancerApi;
@@ -129,7 +131,8 @@ public class FragmentSchool extends Fragment {
         tvSchoolName.setText(school.getName());
         tvSchoolDescription.setText(school.getDescription());
         tvSchoolAddress.setText(getStringAddress(school.getEntityInfo()));
-        tvSchoolRating.setText(school.getRating());
+        ratingBar.setRating(school.getRating().getAverageRating());
+        tvSchoolRating.setText("rating count: " + school.getRating().getRatingCount());
         tvSchoolDances.setText(getStringListDances(school.getDances()));
         tvOwner.setText("");
     }
@@ -171,6 +174,7 @@ public class FragmentSchool extends Fragment {
         tvSchoolDances = view.findViewById(R.id.tvSchoolDances);
         tvOwner = view.findViewById(R.id.tvOwner);
         bReviews = view.findViewById(R.id.bReviews);
+        ratingBar = view.findViewById(R.id.ratingBar);
 
     }
 

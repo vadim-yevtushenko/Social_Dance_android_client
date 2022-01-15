@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -42,7 +43,8 @@ public class SchoolRVAdapter extends RecyclerView.Adapter<SchoolRVAdapter.School
         holder.tvName.setText(schools.get(position).getName());
         holder.tvDescription.setText(schools.get(position).getDescription());
         holder.tvCity.setText(schools.get(position).getEntityInfo().getCity());
-        holder.tvRating.setText(schools.get(position).getRating());
+        holder.ratingBar.setRating(schools.get(position).getRating().getAverageRating());
+        holder.tvRating.setText("rating count: " + schools.get(position).getRating().getRatingCount());
         holder.schoolItemLayout.setOnClickListener(v -> {
             passListener.passSchoolId(schools.get(position).getId());
         });
@@ -59,6 +61,7 @@ public class SchoolRVAdapter extends RecyclerView.Adapter<SchoolRVAdapter.School
         private final TextView tvDescription;
         private final TextView tvCity;
         private final TextView tvRating;
+        private final RatingBar ratingBar;
 
         public SchoolRecyclerVieHolder(@NonNull View itemView) {
             super(itemView);
@@ -67,6 +70,7 @@ public class SchoolRVAdapter extends RecyclerView.Adapter<SchoolRVAdapter.School
             tvDescription = itemView.findViewById(R.id.tvDescription);
             tvCity = itemView.findViewById(R.id.tvCity);
             tvRating = itemView.findViewById(R.id.tvRating);
+            ratingBar = itemView.findViewById(R.id.ratingBar);
         }
     }
 }

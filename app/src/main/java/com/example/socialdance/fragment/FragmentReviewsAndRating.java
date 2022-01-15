@@ -16,8 +16,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,6 +58,8 @@ public class FragmentReviewsAndRating extends Fragment {
     private EditText etReview;
     private Button bSend;
     private Button bSendRating;
+    private CheckBox cbIncognito;
+    private RatingBar ratingBar;
 
     private ArrayAdapter<Integer> spinnerAdapter;
 
@@ -122,7 +126,8 @@ public class FragmentReviewsAndRating extends Fragment {
                 school = response.body();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
                 if (school != null) {
-                    tvRating.setText(school.getRating());
+                    ratingBar.setRating(school.getRating().getAverageRating());
+                    tvRating.setText("rating count: " + school.getRating().getRatingCount());
                     tvSchoolName.setText(school.getName());
                 }
 
@@ -169,7 +174,9 @@ public class FragmentReviewsAndRating extends Fragment {
             if (etReview.getText().toString().trim().isEmpty()){
                 return;
             }
-            Review review = new Review(activity.getRegisteredDancerId(), schoolId, etReview.getText().toString(), new Date());
+            Boolean incognito = cbIncognito.isChecked();
+            Review review = new Review(incognito, activity.getRegisteredDancerId(), schoolId, etReview.getText().toString(), new Date());
+            Log.d("log", "sendReview " + review);
             activity.getPbConnect().setVisibility(View.VISIBLE);
             schoolApi.createReview(review).enqueue(new Callback<Void>() {
                 @Override
@@ -200,7 +207,9 @@ public class FragmentReviewsAndRating extends Fragment {
             @Override
             public void onResponse(Call<List<Review>> call, Response<List<Review>> response) {
                 reviewList.clear();
-                reviewList.addAll(response.body());
+                if (response.body() != null) {
+                    reviewList.addAll(response.body());
+                }
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
                 adapter.notifyDataSetChanged();
 
@@ -233,5 +242,7 @@ public class FragmentReviewsAndRating extends Fragment {
         bSend = view.findViewById(R.id.bSend);
         bSendRating = view.findViewById(R.id.bSendRating);
         tvSchoolName = view.findViewById(R.id.tvSchoolName);
+        cbIncognito = view.findViewById(R.id.cbIncognito);
+        ratingBar = view.findViewById(R.id.ratingBar);
     }
 }
