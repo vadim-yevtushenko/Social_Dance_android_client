@@ -23,7 +23,6 @@ import com.example.socialdance.MainActivity;
 import com.example.socialdance.R;
 import com.example.socialdance.model.Event;
 import com.example.socialdance.fragment.adapter.EventRVAdapter;
-import com.example.socialdance.repository.DataBaseInMemory;
 import com.example.socialdance.retrofit.EventApi;
 import com.example.socialdance.retrofit.NetworkService;
 

@@ -6,12 +6,17 @@ import com.example.socialdance.model.School;
 
 import java.util.List;
 
+import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface SchoolApi {
 
@@ -44,6 +49,13 @@ public interface SchoolApi {
 
     @POST("schools")
     Call<School> updateSchool(@Body School school);
+
+    @Multipart
+    @POST("schools/upload-image")
+    Call<String> uploadImage(@Query("id") Integer id, @Part MultipartBody.Part image);
+
+    @GET("schools/download-image")
+    Call<ResponseBody> downloadImage (@Query("id") Integer id);
 
     @DELETE("schools/{id}")
     Call<Void> deleteSchool(@Path("id") Integer id);

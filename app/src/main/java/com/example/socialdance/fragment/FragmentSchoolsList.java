@@ -21,10 +21,8 @@ import android.widget.Toast;
 
 import com.example.socialdance.MainActivity;
 import com.example.socialdance.R;
-import com.example.socialdance.model.Event;
 import com.example.socialdance.model.School;
 import com.example.socialdance.fragment.adapter.SchoolRVAdapter;
-import com.example.socialdance.repository.DataBaseInMemory;
 import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.retrofit.SchoolApi;
 

@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -93,7 +92,6 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
                         holder.ivAvatar.setImageBitmap(bitmap);
                     }
                 }
-
             }
 
             @Override
@@ -102,11 +100,15 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             }
         });
 
+        holder.tvDescription.setOnClickListener(v -> {
+            editDescription(holder.tvDescription);
+        });
+
         holder.spRole.setAdapter(spinnerAdapter);
         if (dancerList.size() > 0) {
             holder.etName.setText(dancer.getName());
             holder.etSurname.setText(dancer.getSurname());
-            holder.etDescription.setText(dancer.getDescription());
+            holder.tvDescription.setText(dancer.getDescription());
             if (dancer.getBirthday() != null) {
                 holder.tvBirthdayShow.setText(DateTimeUtils.dateFormat.format(dancer.getBirthday()));
             } else {
@@ -177,6 +179,21 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         });
 
         holder.bSchoolAndEvents.setOnClickListener(v -> activity.setFragmentSchoolsAndEvents());
+    }
+
+    private void editDescription(TextView tvDescription) {
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        View viewForDialog = inflater.inflate(R.layout.dialog_write_description, null);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+        alertDialog.setTitle("About myself");
+        alertDialog.setView(viewForDialog);
+        EditText etDescription = viewForDialog.findViewById(R.id.etDescription);
+
+        alertDialog.setPositiveButton("OK", (dialog, which) ->{
+            tvDescription.setText(etDescription.getText().toString());
+        });
+
+        alertDialog.show();
     }
 
     public void deleteDancer(int id) {
@@ -253,7 +270,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
 
         private EditText etName;
         private EditText etSurname;
-        private EditText etDescription;
+        private TextView tvDescription;
         private EditText etCity;
         private EditText etPhone;
         private EditText etEmail;
@@ -282,7 +299,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             super(itemView);
             etName = itemView.findViewById(R.id.etName);
             etSurname = itemView.findViewById(R.id.etSurname);
-            etDescription = itemView.findViewById(R.id.etDescription);
+            tvDescription = itemView.findViewById(R.id.tvDescription);
             tvBirthdayShow = itemView.findViewById(R.id.tvDateShow);
             bBirthday = itemView.findViewById(R.id.bDate);
             etCity = itemView.findViewById(R.id.etCity);
@@ -324,8 +341,8 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             return etSurname;
         }
 
-        public EditText getEtDescription() {
-            return etDescription;
+        public TextView getTvDescription() {
+            return tvDescription;
         }
 
         public EditText getEtCity() {

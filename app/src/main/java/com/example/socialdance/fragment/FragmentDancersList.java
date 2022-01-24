@@ -106,8 +106,8 @@ public class FragmentDancersList extends Fragment {
 
     private void initViews(View view) {
         rvDancersList = view.findViewById(R.id.rvDancersList);
-        etForSearch = new EditText(view.getContext());
-        etForSearch2 = new EditText(view.getContext());
+//        etForSearch = new EditText(view.getContext());
+//        etForSearch2 = new EditText(view.getContext());
     }
 
     @Override

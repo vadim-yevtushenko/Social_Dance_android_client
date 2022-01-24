@@ -1,29 +1,24 @@
 package com.example.socialdance.fragment;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.socialdance.MainActivity;
 import com.example.socialdance.R;
+import com.example.socialdance.fragment.adapter.CreateSchoolOrEventRVAdapter;
 import com.example.socialdance.model.EntityInfo;
 import com.example.socialdance.model.Event;
 import com.example.socialdance.model.School;
@@ -31,62 +26,37 @@ import com.example.socialdance.model.enums.Dances;
 import com.example.socialdance.retrofit.EventApi;
 import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.retrofit.SchoolApi;
-import com.example.socialdance.utils.DateTimeUtils;
 
-import java.text.ParseException;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.example.socialdance.MainActivity.*;
+import static com.example.socialdance.utils.UploadImageUtils.getCompressImage;
+import static com.example.socialdance.utils.UploadImageUtils.getPath;
 
 
 public class FragmentCreateSchoolOrEvent extends Fragment {
 
-    private EditText etName;
-    private EditText etPhone;
-    private EditText etDescription;
-    private EditText etCountry;
-    private EditText etCity;
-    private EditText etStreet;
-    private EditText etBuilding;
-    private EditText etSuite;
-    private EditText etEmail;
-    private TextView tvDateShow;
-    private Button bDate;
-    private TextView tvDateToShow;
-    private Button bDateTo;
     private ImageView ivSave;
     private ImageView ivBack;
-    //    private ImageView ivAvatar;
-//    private CircleTextView ctvAvatar;
-    private Spinner spRole;
-    private CheckBox cbBachata;
-    private CheckBox cbSalsa;
-    private CheckBox cbKizomba;
-    private CheckBox cbZouk;
-    private CheckBox cbMambo;
-    private CheckBox cbMerenge;
-    private CheckBox cbReggaeton;
-    private CheckBox cbTango;
-
+    private RecyclerView rvCreateSchoolOrEvent;
 
     private SchoolApi schoolApi;
     private EventApi eventApi;
 
-    private ArrayAdapter<String> spinnerAdapter;
-    private final String EVENT = "Event";
-    private final String SCHOOL = "School";
-
-    private Date dateStart;
-    private Date dateFinish;
-
     private MainActivity activity;
+    private CreateSchoolOrEventRVAdapter.CreateSchoolOrEventRVHolder holder;
+    private CreateSchoolOrEventRVAdapter adapter;
+
+    private ImagePassListener imagePassListener;
 
     @Override
     public void onAttach(@NonNull Context context) {
@@ -99,25 +69,34 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         activity = (MainActivity) getActivity();
+        imagePassListener = activity;
         View view = inflater.inflate(R.layout.fragment_create_school_or_event, container, false);
         initViews(view);
-        String[] roles = {EVENT, SCHOOL};
-        spinnerAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, roles);
-        spRole.setAdapter(spinnerAdapter);
+        createRecyclerView();
+        holder = adapter.getSchoolOrEventRVHolder();
+
         initListeners();
         ivSave.setOnClickListener(this::create);
         ivBack.setOnClickListener(this::back);
         return view;
     }
 
+    private void createRecyclerView() {
+        adapter = new CreateSchoolOrEventRVAdapter();
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        rvCreateSchoolOrEvent.setLayoutManager(linearLayoutManager);
+        rvCreateSchoolOrEvent.setAdapter(adapter);
+    }
+
     private void back(View view) {
+        activity.setImage(null);
         activity.setProfile();
     }
 
     private void create(View view) {
-        if (spRole.getSelectedItem().equals(EVENT)) {
+        if (holder.getSpRole().getSelectedItem().equals(adapter.getEVENT())) {
             createEvent();
-        } else if (spRole.getSelectedItem().equals(SCHOOL)) {
+        } else if (holder.getSpRole().getSelectedItem().equals(adapter.getSCHOOL())) {
             createSchool();
         }
 
@@ -140,6 +119,7 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
                 School newSchool = response.body();
 
                 if (newSchool != null) {
+                    uploadSchoolImage(newSchool.getId());
                     Toast toast = Toast.makeText(activity, "School saved successfully", Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
                     toast.show();
@@ -162,38 +142,59 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
 
     }
 
+    private void uploadSchoolImage(Integer id) {
+        if (activity.getImage() != null) {
+
+            File image = new File(getPath(activity.getImage(), activity));
+            byte[] byteArray = getCompressImage(getPath(activity.getImage(), activity));
+            RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), byteArray);
+            MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", image.getName(), requestBody);
+            schoolApi.uploadImage(id, fileToUpload).enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    activity.setImage(null);
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    Log.d("log", "onFailure " + t.toString());
+                }
+            });
+        }
+    }
+
     private School prepareSchoolForCreate() {
         School school = new School();
         school.setOwnerId(activity.getRegisteredDancerId());
-        EntityInfo entityInfo = new EntityInfo(etCountry.getText().toString(), etCity.getText().toString(),
-                etStreet.getText().toString(), etBuilding.getText().toString(), etSuite.getText().toString(),
-                etPhone.getText().toString(), null);
-        school.setName(etName.getText().toString());
-        school.setDescription(etDescription.getText().toString());
+        EntityInfo entityInfo = new EntityInfo(holder.getEtCountry().getText().toString(), holder.getEtCity().getText().toString(),
+                holder.getEtStreet().getText().toString(), holder.getEtBuilding().getText().toString(), holder.getEtSuite().getText().toString(),
+                holder.getEtPhone().getText().toString(), null);
+        school.setName(holder.getEtName().getText().toString());
+        school.setDescription(holder.getTvDescription().getText().toString());
         school.setEntityInfo(entityInfo);
         school.setDances(new ArrayList<>());
-        if (cbSalsa.isChecked()) {
+        if (holder.getCbSalsa().isChecked()) {
             school.getDances().add(Dances.SALSA);
         }
-        if (cbBachata.isChecked()) {
+        if (holder.getCbBachata().isChecked()) {
             school.getDances().add(Dances.BACHATA);
         }
-        if (cbKizomba.isChecked()) {
+        if (holder.getCbKizomba().isChecked()) {
             school.getDances().add(Dances.KIZOMBA);
         }
-        if (cbZouk.isChecked()) {
+        if (holder.getCbZouk().isChecked()) {
             school.getDances().add(Dances.ZOUK);
         }
-        if (cbReggaeton.isChecked()) {
+        if (holder.getCbReggaeton().isChecked()) {
             school.getDances().add(Dances.REGGAETON);
         }
-        if (cbMerenge.isChecked()) {
+        if (holder.getCbMerenge().isChecked()) {
             school.getDances().add(Dances.MERENGE);
         }
-        if (cbMambo.isChecked()) {
+        if (holder.getCbMambo().isChecked()) {
             school.getDances().add(Dances.MAMBO);
         }
-        if (cbTango.isChecked()) {
+        if (holder.getCbTango().isChecked()) {
             school.getDances().add(Dances.TANGO);
         }
         return school;
@@ -221,6 +222,7 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
                 Event newEvent = response.body();
 
                 if (newEvent != null) {
+                    uploadEventImage(newEvent.getId());
                     Toast toast = Toast.makeText(activity, "Event saved successfully", Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
                     toast.show();
@@ -242,178 +244,83 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
         });
     }
 
+    private void uploadEventImage(Integer id) {
+        if (activity.getImage() != null) {
+
+            File image = new File(getPath(activity.getImage(), activity));
+            byte[] byteArray = getCompressImage(getPath(activity.getImage(), activity));
+            RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), byteArray);
+            MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", image.getName(), requestBody);
+            eventApi.uploadImage(id, fileToUpload).enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    activity.setImage(null);
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    Log.d("log", "onFailure " + t.toString());
+                }
+            });
+        }
+    }
+
     private Event prepareEventForCreate() {
         Event event = new Event();
         event.setOwnerId(activity.getRegisteredDancerId());
-        EntityInfo entityInfo = new EntityInfo(etCountry.getText().toString(), etCity.getText().toString(),
-                etStreet.getText().toString(), etBuilding.getText().toString(), etSuite.getText().toString(),
-                etPhone.getText().toString(), null);
-        event.setName(etName.getText().toString());
-        event.setDescription(etDescription.getText().toString());
+        EntityInfo entityInfo = new EntityInfo(holder.getEtCountry().getText().toString(), holder.getEtCity().getText().toString(),
+                holder.getEtStreet().getText().toString(), holder.getEtBuilding().getText().toString(), holder.getEtSuite().getText().toString(),
+                holder.getEtPhone().getText().toString(), null);
+        event.setName(holder.getEtName().getText().toString());
+        event.setDescription(holder.getTvDescription().getText().toString());
         event.setEntityInfo(entityInfo);
         event.setDances(new ArrayList<>());
-        if (cbSalsa.isChecked()) {
+        if (holder.getCbSalsa().isChecked()) {
             event.getDances().add(Dances.SALSA);
         }
-        if (cbBachata.isChecked()) {
+        if (holder.getCbBachata().isChecked()) {
             event.getDances().add(Dances.BACHATA);
         }
-        if (cbKizomba.isChecked()) {
+        if (holder.getCbKizomba().isChecked()) {
             event.getDances().add(Dances.KIZOMBA);
         }
-        if (cbZouk.isChecked()) {
+        if (holder.getCbZouk().isChecked()) {
             event.getDances().add(Dances.ZOUK);
         }
-        if (cbReggaeton.isChecked()) {
+        if (holder.getCbReggaeton().isChecked()) {
             event.getDances().add(Dances.REGGAETON);
         }
-        if (cbMerenge.isChecked()) {
+        if (holder.getCbMerenge().isChecked()) {
             event.getDances().add(Dances.MERENGE);
         }
-        if (cbMambo.isChecked()) {
+        if (holder.getCbMambo().isChecked()) {
             event.getDances().add(Dances.MAMBO);
         }
-        if (cbTango.isChecked()) {
+        if (holder.getCbTango().isChecked()) {
             event.getDances().add(Dances.TANGO);
         }
         event.setDatePublication(new Date());
-        event.setDateEvent(dateStart);
-        event.setDateFinishEvent(dateFinish);
+        event.setDateEvent(adapter.getDateStart());
+        event.setDateFinishEvent(adapter.getDateFinish());
         return event;
     }
 
     private void initListeners() {
-        spRole.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-                if (spRole.getSelectedItem().equals(SCHOOL)) {
-                    bDate.setVisibility(View.INVISIBLE);
-                    bDateTo.setVisibility(View.INVISIBLE);
-                    tvDateShow.setVisibility(View.INVISIBLE);
-                    tvDateToShow.setVisibility(View.INVISIBLE);
-                } else {
-                    bDate.setVisibility(View.VISIBLE);
-                    bDateTo.setVisibility(View.VISIBLE);
-                    tvDateShow.setVisibility(View.VISIBLE);
-                    tvDateToShow.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        bDate.setOnClickListener(v -> {
-            Calendar calendar = new GregorianCalendar();
-            StringBuilder dateBuilder = new StringBuilder();
-            StringBuilder timeBuilder = new StringBuilder();
-            DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    getActivity(),
-                    (DatePickerDialog.OnDateSetListener) (view1, year, month, dayOfMonth) -> {
-                        Integer m = (month + 1);
-                        String monthStr = String.valueOf(m).length() > 1 ? String.valueOf(m) : "0" + m;
-                        dateBuilder.append(dayOfMonth).
-                                append(".").append(monthStr).
-                                append(".").append(year);
-                        tvDateShow.setText(dateBuilder.toString() + timeBuilder.toString());
-                        try {
-                            dateStart = DateTimeUtils.dateTimeFormat
-                                    .parse(dateBuilder.toString() + timeBuilder.toString());
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    },
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH)
-
-            );
-            TimePickerDialog timePickerDialog = new TimePickerDialog(
-                    getActivity(),
-                    (view, hourOfDay, minute) -> {
-                        timeBuilder.append(" ").
-                                append(String.valueOf(hourOfDay).length() == 1 ? "0" + hourOfDay : hourOfDay).
-                                append(":").append(String.valueOf(minute).length() == 1 ? "0" + minute : minute);
-                    },
-                    calendar.get(Calendar.HOUR),
-                    calendar.get(Calendar.MINUTE),
-                    true
-            );
-            datePickerDialog.getDatePicker().setMinDate(new Date().getTime());
-            datePickerDialog.show();
-            timePickerDialog.show();
-        });
-
-        bDateTo.setOnClickListener(v -> {
-            Calendar calendar = new GregorianCalendar();
-            StringBuilder dateBuilder = new StringBuilder();
-            StringBuilder timeBuilder = new StringBuilder();
-            DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    getActivity(),
-                    (DatePickerDialog.OnDateSetListener) (view1, year, month, dayOfMonth) -> {
-                        Integer m = (month + 1);
-                        String monthStr = String.valueOf(m).length() > 1 ? String.valueOf(m) : "0" + m;
-                        dateBuilder.append(dayOfMonth).
-                                append(".").append(monthStr).
-                                append(".").append(year);
-                        tvDateToShow.setText(dateBuilder.toString() + timeBuilder.toString());
-                        try {
-                            dateFinish = DateTimeUtils.dateTimeFormat
-                                    .parse(dateBuilder.toString() + timeBuilder.toString());
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                    },
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH),
-                    calendar.get(Calendar.DAY_OF_MONTH)
-
-            );
-            TimePickerDialog timePickerDialog = new TimePickerDialog(
-                    getActivity(),
-                    (view, hourOfDay, minute) -> {
-                        timeBuilder.append(" ").
-                                append(String.valueOf(hourOfDay).length() == 1 ? "0" + hourOfDay : hourOfDay).
-                                append(":").append(String.valueOf(minute).length() == 1 ? "0" + minute : minute);
-                    },
-                    calendar.get(Calendar.HOUR),
-                    calendar.get(0),
-                    true
-            );
-            datePickerDialog.getDatePicker().setMinDate(new Date().getTime());
-            datePickerDialog.show();
-            timePickerDialog.show();
-        });
+        holder.getIvAvatar().setOnClickListener(v -> setImage());
     }
 
-    private void initViews(View view) {
-        etName = view.findViewById(R.id.etName);
-        etDescription = view.findViewById(R.id.etDescription);
-        tvDateShow = view.findViewById(R.id.tvDateShow);
-        bDate = view.findViewById(R.id.bDate);
-        etCountry = view.findViewById(R.id.etCountry);
-        etCity = view.findViewById(R.id.etCity);
-        etStreet = view.findViewById(R.id.etStreet);
-        etBuilding = view.findViewById(R.id.etBuilding);
-        etSuite = view.findViewById(R.id.etSuite);
-        etPhone = view.findViewById(R.id.etPhone);
-//        etEmail = view.findViewById(R.id.etEmail);
+    private void setImage() {
+        imagePassListener.uploadPicture();
+        if (activity.getImage() != null) {
+            holder.getIvAvatar().setImageURI(activity.getImage());
+        }
+    }
+
+    private void initViews(@NonNull View view) {
+
         ivSave = view.findViewById(R.id.ivSave);
         ivBack = view.findViewById(R.id.ivBack);
-//        ivAvatar = view.findViewById(R.id.ivAvatar);
-//        ctvAvatar = view.findViewById(R.id.ctvAvatar);
-        spRole = view.findViewById(R.id.spRole);
-        cbBachata = view.findViewById(R.id.cbBachata);
-        cbSalsa = view.findViewById(R.id.cbSalsa);
-        cbKizomba = view.findViewById(R.id.cbKizomba);
-        cbZouk = view.findViewById(R.id.cbZouk);
-        cbMambo = view.findViewById(R.id.cbMambo);
-        cbMerenge = view.findViewById(R.id.cbMerenge);
-        cbReggaeton = view.findViewById(R.id.cbReggaeton);
-        cbTango = view.findViewById(R.id.cbTango);
-        tvDateToShow = view.findViewById(R.id.tvDateToShow);
-        bDateTo = view.findViewById(R.id.bDateTo);
+        rvCreateSchoolOrEvent = view.findViewById(R.id.rvCreateSchoolOrEvent);
+
     }
 }

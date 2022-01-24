@@ -84,7 +84,6 @@ public class FragmentSchoolsAndEvents extends Fragment {
                     entityList.addAll(schools);
                 }
                 downloadEvents();
-//                schoolsAndEventsRVAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -124,14 +123,6 @@ public class FragmentSchoolsAndEvents extends Fragment {
 
     private void back(View view) {
         activity.setProfile();
-    }
-
-    public void delete() {
-
-    }
-
-    public void save() {
-
     }
 
     public void createSchoolsAndEventsRecyclerView() {

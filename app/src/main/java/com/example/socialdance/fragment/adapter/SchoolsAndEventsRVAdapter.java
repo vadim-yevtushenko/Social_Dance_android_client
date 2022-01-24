@@ -3,15 +3,17 @@ package com.example.socialdance.fragment.adapter;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.socialdance.MainActivity;
 import com.example.socialdance.R;
 import com.example.socialdance.fragment.FragmentSchoolsAndEvents;
+import com.example.socialdance.fragment.ImagePassListener;
 import com.example.socialdance.model.AbstractBaseEntity;
 import com.example.socialdance.model.Event;
 import com.example.socialdance.model.School;
@@ -32,29 +35,37 @@ import com.example.socialdance.retrofit.SchoolApi;
 import com.example.socialdance.utils.CircleTextView;
 import com.example.socialdance.utils.DateTimeUtils;
 
+import java.io.File;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
+import static com.example.socialdance.utils.UploadImageUtils.getCompressImage;
+import static com.example.socialdance.utils.UploadImageUtils.getPath;
 
 public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEventsRVAdapter.SchoolsAndEventsRecyclerViewHolder> {
     private Context context;
-    MainActivity activity;
+    private MainActivity activity;
     private List<AbstractBaseEntity> entityList;
     private FragmentSchoolsAndEvents fragmentSchoolsAndEvents;
-    private ArrayAdapter<String> spinnerAdapter;
     private final String EVENT = "Event";
     private final String SCHOOL = "School";
 
     private SchoolApi schoolApi;
     private EventApi eventApi;
+    private ImagePassListener imagePassListener;
 
 
     public SchoolsAndEventsRVAdapter(List<AbstractBaseEntity> entityList, FragmentSchoolsAndEvents fragmentSchoolsAndEvents) {
@@ -69,6 +80,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
     public SchoolsAndEventsRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
         activity = (MainActivity) context;
+        imagePassListener = activity;
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.schools_and_events_item, parent, false);
         SchoolsAndEventsRecyclerViewHolder viewHolder = new SchoolsAndEventsRecyclerViewHolder(view);
@@ -79,8 +91,33 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
     public void onBindViewHolder(@NonNull SchoolsAndEventsRecyclerViewHolder holder, int position) {
         AbstractBaseEntity entity = entityList.get(position);
 
+        holder.ivAvatar.setImageResource(R.drawable.plug);
+        if (entity.getImage() != null) {
+            schoolApi.downloadImage(entity.getId()).enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.body() != null) {
+                        InputStream inputStream = response.body().byteStream();
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap != null) {
+                            holder.ivAvatar.setImageBitmap(bitmap);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                }
+            });
+        }
+
+        holder.tvDescription.setOnClickListener(v -> {
+            editDescription(holder.tvDescription);
+        });
+
         holder.etName.setText(entity.getName());
-        holder.etDescription.setText(entity.getDescription());
+        holder.tvDescription.setText(entity.getDescription());
         if (entity.getEntityInfo() != null) {
             holder.etCountry.setText(entity.getEntityInfo().getCountry());
             holder.etCity.setText(entity.getEntityInfo().getCity());
@@ -93,8 +130,8 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         setCheckBoxes(holder, position);
         if (entity instanceof Event) {
             holder.tvRole.setText(EVENT.toUpperCase());
-            holder.tvDateShow.setText(DateTimeUtils.dateTimeFormat.format(((Event)entity).getDateEvent()));
-            holder.tvDateToShow.setText(DateTimeUtils.dateTimeFormat.format(((Event)entity).getDateFinishEvent()));
+            holder.tvDateShow.setText(DateTimeUtils.dateTimeFormat.format(((Event) entity).getDateEvent()));
+            holder.tvDateToShow.setText(DateTimeUtils.dateTimeFormat.format(((Event) entity).getDateFinishEvent()));
 
             holder.bDate.setOnClickListener(v -> {
                 Calendar calendar = new GregorianCalendar();
@@ -152,7 +189,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
                                     append(".").append(year);
                             holder.tvDateToShow.setText(dateBuilder.toString() + timeBuilder.toString());
                             try {
-                                ((Event)entity).setDateFinishEvent(DateTimeUtils.dateTimeFormat
+                                ((Event) entity).setDateFinishEvent(DateTimeUtils.dateTimeFormat
                                         .parse(dateBuilder.toString() + timeBuilder.toString()));
                             } catch (ParseException e) {
                                 e.printStackTrace();
@@ -188,7 +225,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         }
         holder.bDelete.setOnClickListener(v -> {
 
-            if (entity instanceof Event){
+            if (entity instanceof Event) {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context).
                         setTitle("Your event will be deleted!").
                         setMessage("Do you want delete your event?").
@@ -198,7 +235,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
                         setNeutralButton("CANCEL", (dialog, which) -> {
                         });
                 alertDialog.show();
-            }else {
+            } else {
                 AlertDialog.Builder alertDialog = new AlertDialog.Builder(context).
                         setTitle("Your school will be deleted!").
                         setMessage("Do you want delete your school?").
@@ -215,12 +252,38 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
 
         holder.bSave.setOnClickListener(v -> {
             AbstractBaseEntity entityForUpdate = updateEntityForSave(entity, holder);
-            if (entity instanceof Event){
+            if (entity instanceof Event) {
                 saveEvent((Event) entityForUpdate);
-            }else {
+            } else {
                 saveSchool((School) entityForUpdate);
             }
         });
+
+        holder.ivAvatar.setOnClickListener(v -> {
+            setImage(holder.ivAvatar);
+        });
+    }
+
+    private void editDescription(TextView tvDescription) {
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        View viewForDialog = inflater.inflate(R.layout.dialog_write_description, null);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+        alertDialog.setTitle("About myself");
+        alertDialog.setView(viewForDialog);
+        EditText etDescription = viewForDialog.findViewById(R.id.etDescription);
+
+        alertDialog.setPositiveButton("OK", (dialog, which) ->{
+            tvDescription.setText(etDescription.getText().toString());
+        });
+
+        alertDialog.show();
+    }
+
+    private void setImage(ImageView ivImage) {
+        imagePassListener.uploadPicture();
+        if (activity.getImage() != null) {
+            ivImage.setImageURI(activity.getImage());
+        }
     }
 
     private void saveSchool(School school) {
@@ -230,7 +293,8 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
             public void onResponse(Call<School> call, Response<School> response) {
                 School newSchool = response.body();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
-                if (newSchool != null){
+                if (newSchool != null) {
+                    uploadSchoolImage(newSchool.getId());
                     Toast toast = Toast.makeText(activity, "School saved", Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
                     toast.show();
@@ -254,7 +318,8 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
             public void onResponse(Call<Event> call, Response<Event> response) {
                 Event newEvent = response.body();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
-                if (newEvent != null){
+                if (newEvent != null) {
+                    uploadEventImage(newEvent.getId());
                     Toast toast = Toast.makeText(activity, "Event saved", Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
                     toast.show();
@@ -271,6 +336,48 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         });
     }
 
+    private void uploadSchoolImage(Integer id) {
+        if (activity.getImage() != null) {
+
+            File image = new File(getPath(activity.getImage(), activity));
+            byte[] byteArray = getCompressImage(getPath(activity.getImage(), activity));
+            RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), byteArray);
+            MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", image.getName(), requestBody);
+            schoolApi.uploadImage(id, fileToUpload).enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    activity.setImage(null);
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    Log.d("log", "onFailure " + t.toString());
+                }
+            });
+        }
+    }
+
+    private void uploadEventImage(Integer id) {
+        if (activity.getImage() != null) {
+
+            File image = new File(getPath(activity.getImage(), activity));
+            byte[] byteArray = getCompressImage(getPath(activity.getImage(), activity));
+            RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), byteArray);
+            MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", image.getName(), requestBody);
+            eventApi.uploadImage(id, fileToUpload).enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(Call<String> call, Response<String> response) {
+                    activity.setImage(null);
+                }
+
+                @Override
+                public void onFailure(Call<String> call, Throwable t) {
+                    Log.d("log", "onFailure " + t.toString());
+                }
+            });
+        }
+    }
+
     private AbstractBaseEntity updateEntityForSave(AbstractBaseEntity entity, SchoolsAndEventsRecyclerViewHolder holder) {
         entity.setName(holder.etName.getText().toString());
         entity.getEntityInfo().setCountry(holder.etCountry.getText().toString());
@@ -279,36 +386,36 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         entity.getEntityInfo().setBuilding(holder.etBuilding.getText().toString());
         entity.getEntityInfo().setSuites(holder.etSuite.getText().toString());
         entity.getEntityInfo().setPhoneNumber(holder.etPhone.getText().toString());
-        entity.setDescription(holder.etDescription.getText().toString());
+        entity.setDescription(holder.tvDescription.getText().toString());
 
         entity.getDances().clear();
-        if (holder.cbSalsa.isChecked()){
+        if (holder.cbSalsa.isChecked()) {
             entity.getDances().add(Dances.SALSA);
         }
-        if (holder.cbBachata.isChecked()){
+        if (holder.cbBachata.isChecked()) {
             entity.getDances().add(Dances.BACHATA);
         }
-        if (holder.cbKizomba.isChecked()){
+        if (holder.cbKizomba.isChecked()) {
             entity.getDances().add(Dances.KIZOMBA);
         }
-        if (holder.cbZouk.isChecked()){
+        if (holder.cbZouk.isChecked()) {
             entity.getDances().add(Dances.ZOUK);
         }
-        if (holder.cbReggaeton.isChecked()){
+        if (holder.cbReggaeton.isChecked()) {
             entity.getDances().add(Dances.REGGAETON);
         }
-        if (holder.cbMerenge.isChecked()){
+        if (holder.cbMerenge.isChecked()) {
             entity.getDances().add(Dances.MERENGE);
         }
-        if (holder.cbMambo.isChecked()){
+        if (holder.cbMambo.isChecked()) {
             entity.getDances().add(Dances.MAMBO);
         }
-        if (holder.cbTango.isChecked()){
+        if (holder.cbTango.isChecked()) {
             entity.getDances().add(Dances.TANGO);
         }
 
-        if (entity instanceof Event){
-            ((Event)entity).setDatePublication(new Date());
+        if (entity instanceof Event) {
+            ((Event) entity).setDatePublication(new Date());
         }
         return entity;
     }
@@ -399,7 +506,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
     class SchoolsAndEventsRecyclerViewHolder extends RecyclerView.ViewHolder {
 
         private EditText etName;
-        private EditText etDescription;
+        private TextView tvDescription;
         private EditText etPhone;
         private EditText etCountry;
         private EditText etCity;
@@ -412,7 +519,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         private Button bDateTo;
         private Button bDelete;
         private Button bSave;
-        //        private ImageView ivAvatar;
+        private ImageView ivAvatar;
         private CircleTextView ctvAvatar;
         private TextView tvRole;
         private CheckBox cbBachata;
@@ -428,7 +535,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
             super(itemView);
             etName = itemView.findViewById(R.id.etName);
             etPhone = itemView.findViewById(R.id.etPhone);
-            etDescription = itemView.findViewById(R.id.etDescription);
+            tvDescription = itemView.findViewById(R.id.etDescription);
             tvDateShow = itemView.findViewById(R.id.tvDateShow);
             bDate = itemView.findViewById(R.id.bDate);
             etCountry = itemView.findViewById(R.id.etCountry);
@@ -438,7 +545,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
             etSuite = itemView.findViewById(R.id.etSuite);
             bDelete = itemView.findViewById(R.id.bDelete);
             bSave = itemView.findViewById(R.id.bSave);
-//            ivAvatar = itemView.findViewById(R.id.ivAvatar);
+            ivAvatar = itemView.findViewById(R.id.ivAvatar);
             ctvAvatar = itemView.findViewById(R.id.ctvAvatar);
             tvRole = itemView.findViewById(R.id.tvRole);
             cbBachata = itemView.findViewById(R.id.cbBachata);

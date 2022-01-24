@@ -1,10 +1,6 @@
 package com.example.socialdance.fragment;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,7 +9,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -36,7 +31,6 @@ import com.example.socialdance.retrofit.DancerApi;
 import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.utils.DateTimeUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -50,13 +44,14 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.example.socialdance.MainActivity.TOAST_Y_GRAVITY;
+import static com.example.socialdance.utils.UploadImageUtils.getCompressImage;
+import static com.example.socialdance.utils.UploadImageUtils.getPath;
 
 
 public class FragmentProfile extends Fragment {
 
     private ImageView ivSave;
     private RecyclerView rvProfile;
-    private LinearLayoutManager linearLayoutManager;
     private ProfileRVAdapter profileRVAdapter;
     private List<Dancer> dancerList;
     private Dancer dancer;
@@ -152,15 +147,13 @@ public class FragmentProfile extends Fragment {
         });
     }
 
-
-
     private void createDancerForSave() {
 
         ProfileRVAdapter.ProfileRecyclerViewHolder holder = profileRVAdapter.getHolderGlobal();
 
         dancer.setName(holder.getEtName().getText().toString());
         dancer.setSurname(holder.getEtSurname().getText().toString());
-        dancer.setDescription(holder.getEtDescription().getText().toString());
+        dancer.setDescription(holder.getTvDescription().getText().toString());
         dancer.getEntityInfo().setCity(holder.getEtCity().getText().toString());
         dancer.getEntityInfo().setPhoneNumber(holder.getEtPhone().getText().toString());
         dancer.getEntityInfo().setEmail(holder.getEtEmail().getText().toString());
@@ -208,7 +201,7 @@ public class FragmentProfile extends Fragment {
 
     public void createProfileRecyclerView() {
         profileRVAdapter = new ProfileRVAdapter(dancerList, this);
-        linearLayoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         rvProfile.setLayoutManager(linearLayoutManager);
         rvProfile.setAdapter(profileRVAdapter);
     }
@@ -225,16 +218,15 @@ public class FragmentProfile extends Fragment {
                 setPositiveButton("OK", (dialog, which) -> {
                     if (activity.getImage() != null) {
                         profileRVAdapter.notifyDataSetChanged();
-                        File image = new File(getPath(activity.getImage()));
-                        byte[] byteArray = getCompressImage(getPath(activity.getImage()));
+                        File image = new File(getPath(activity.getImage(), activity));
+                        byte[] byteArray = getCompressImage(getPath(activity.getImage(), activity));
                         RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), byteArray);
                         MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", image.getName(), requestBody);
                         dancerApi.uploadImage(id, fileToUpload).enqueue(new Callback<String>() {
                             @Override
                             public void onResponse(Call<String> call, Response<String> response) {
-                                String body = response.body();
-                                Log.d("log", "onResponse " + body);
                                 profileRVAdapter.notifyDataSetChanged();
+                                activity.setImage(null);
                             }
 
                             @Override
@@ -251,25 +243,6 @@ public class FragmentProfile extends Fragment {
                 setNeutralButton("CANCEL", (dialog, which) -> {
                 });
         alertDialog.show();
-    }
-
-    private byte[] getCompressImage(String path) {
-        Bitmap bitmap = BitmapFactory.decodeFile(path);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, stream);
-        return stream.toByteArray();
-    }
-
-    public String getPath(Uri uri)
-    {
-        String[] projection = { MediaStore.Images.Media.DATA };
-        Cursor cursor = activity.getContentResolver().query(uri, projection, null, null, null);
-        if (cursor == null) return null;
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-        cursor.moveToFirst();
-        String s=cursor.getString(column_index);
-        cursor.close();
-        return s;
     }
 
     private void initViews(View view) {

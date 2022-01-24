@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -21,7 +22,6 @@ import com.example.socialdance.model.Dancer;
 import com.example.socialdance.model.EntityInfo;
 import com.example.socialdance.model.Event;
 import com.example.socialdance.model.enums.Dances;
-import com.example.socialdance.repository.DataBaseInMemory;
 import com.example.socialdance.retrofit.DancerApi;
 import com.example.socialdance.retrofit.EventApi;
 import com.example.socialdance.retrofit.NetworkService;
@@ -75,7 +75,21 @@ public class FragmentEvent extends Fragment {
         downloadEvent();
 
         ivBack.setOnClickListener(this::back);
+        tvEventDescription.setOnClickListener(this::showDescription);
         return view;
+    }
+
+    private void showDescription(View view) {
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        View viewForDialog = inflater.inflate(R.layout.dialog_read_description, null);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+        alertDialog.setTitle("Event description");
+        alertDialog.setView(viewForDialog);
+        TextView tvFullDescription = viewForDialog.findViewById(R.id.tvFullDescription);
+        tvFullDescription.setText(event.getDescription());
+        alertDialog.setPositiveButton("OK", (dialog, which) ->{});
+
+        alertDialog.show();
     }
 
     private void downloadEvent() {

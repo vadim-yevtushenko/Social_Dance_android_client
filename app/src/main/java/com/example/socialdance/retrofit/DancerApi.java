@@ -1,8 +1,5 @@
 package com.example.socialdance.retrofit;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import com.example.socialdance.model.Dancer;
 
 import java.util.List;
@@ -12,7 +9,6 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
-import retrofit2.http.Field;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -45,7 +41,7 @@ public interface DancerApi {
     Call<String> uploadImage(@Query("id") Integer id, @Part MultipartBody.Part image);
 
     @GET("dancers/download-image")
-    public Call<ResponseBody> downloadImage (@Query("id") Integer id);
+    Call<ResponseBody> downloadImage (@Query("id") Integer id);
 
     @DELETE("dancers/{id}")
     Call<Void> deleteDancer(@Path("id") Integer id);

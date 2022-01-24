@@ -42,8 +42,9 @@
 
         <TextView
             android:id="@+id/tvSchoolName"
-            android:layout_width="wrap_content"
+            android:layout_width="280dp"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:layout_marginTop="15dp"
             android:layout_marginBottom="15dp"
             android:text="School"
@@ -51,8 +52,10 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@+id/textView16"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintHorizontal_bias="0.387"
+            app:layout_constraintStart_toEndOf="@+id/ivBack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.375" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -162,7 +165,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout4"
         android:layout_width="0dp"
-        android:layout_height="100dp"
+        android:layout_height="90dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
@@ -200,7 +203,7 @@
             android:id="@+id/cbIncognito"
             android:layout_width="wrap_content"
             android:layout_height="20dp"
-            android:layout_marginBottom="68dp"
+            android:layout_marginBottom="63dp"
             android:text="incognito"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

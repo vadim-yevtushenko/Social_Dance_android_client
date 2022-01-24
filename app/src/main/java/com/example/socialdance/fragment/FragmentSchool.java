@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -78,7 +79,21 @@ public class FragmentSchool extends Fragment {
         downloadSchool();
         bReviews.setOnClickListener(this::reviews);
         ivBack.setOnClickListener(this::back);
+        tvSchoolDescription.setOnClickListener(this::showDescription);
         return view;
+    }
+
+    private void showDescription(View view) {
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        View viewForDialog = inflater.inflate(R.layout.dialog_read_description, null);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+        alertDialog.setTitle("School description");
+        alertDialog.setView(viewForDialog);
+        TextView tvFullDescription = viewForDialog.findViewById(R.id.tvFullDescription);
+        tvFullDescription.setText(school.getDescription());
+        alertDialog.setPositiveButton("OK", (dialog, which) ->{});
+
+        alertDialog.show();
     }
 
     private void reviews(View view) {
