@@ -35,6 +35,7 @@ import com.example.socialdance.retrofit.SchoolApi;
 import com.example.socialdance.utils.CircleTextView;
 import com.example.socialdance.utils.DateTimeUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -91,29 +92,61 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
     public void onBindViewHolder(@NonNull SchoolsAndEventsRecyclerViewHolder holder, int position) {
         AbstractBaseEntity entity = entityList.get(position);
 
-        holder.ivAvatar.setImageResource(R.drawable.plug);
-        if (entity.getImage() != null) {
-            schoolApi.downloadImage(entity.getId()).enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                    if (response.body() != null) {
-                        InputStream inputStream = response.body().byteStream();
-                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                        if (bitmap != null) {
-                            holder.ivAvatar.setImageBitmap(bitmap);
-                        }
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-
-                }
+        holder.ivAvatar.setOnClickListener(v -> {
+            Button button = new Button(activity);
+            button.setText("Open gallery");
+            button.setOnClickListener(v1 -> {
+                imagePassListener.uploadPicture();
             });
-        }
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity).
+                    setTitle("\t\t\t\t\t\tSet the avatar!").
+                    setView(button).
+                    setPositiveButton("OK", (dialog, which) -> {
+                        if (activity.getImage() != null) {
+                            holder.bitmap = BitmapFactory.decodeFile(getPath(activity.getImage(), activity));
+                            holder.ivAvatar.setImageBitmap(holder.bitmap);
+                            activity.setImage(null);
+                        }
+                    }).
+                    setNegativeButton("DELETE", (dialog, which) -> {
+                        if (entity.getImage() != null){
+                            if (entity instanceof Event){
+                                eventApi.deleteImage(entity.getId()).enqueue(new Callback<Void>() {
+                                    @Override
+                                    public void onResponse(Call<Void> call, Response<Void> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Void> call, Throwable t) {
+
+                                    }
+                                });
+                            }else {
+                                schoolApi.deleteImage(entity.getId()).enqueue(new Callback<Void>() {
+                                    @Override
+                                    public void onResponse(Call<Void> call, Response<Void> response) {
+
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<Void> call, Throwable t) {
+
+                                    }
+                                });
+                            }
+                        }
+                        activity.setImage(null);
+                        holder.ivAvatar.setImageResource(R.drawable.plug);
+                    }).
+                    setNeutralButton("CANCEL", (dialog, which) -> {
+                    });
+            alertDialog.show();
+        });
+        holder.ivAvatar.setImageResource(R.drawable.plug);
 
         holder.tvDescription.setOnClickListener(v -> {
-            editDescription(holder.tvDescription);
+            editDescription(holder.tvDescription, entity.getDescription());
         });
 
         holder.etName.setText(entity.getName());
@@ -128,7 +161,27 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         }
 
         setCheckBoxes(holder, position);
+
         if (entity instanceof Event) {
+            if (entity.getImage() != null) {
+                eventApi.downloadImage(entity.getId()).enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.body() != null) {
+                            InputStream inputStream = response.body().byteStream();
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            if (bitmap != null) {
+                                holder.ivAvatar.setImageBitmap(bitmap);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
+            }
             holder.tvRole.setText(EVENT.toUpperCase());
             holder.tvDateShow.setText(DateTimeUtils.dateTimeFormat.format(((Event) entity).getDateEvent()));
             holder.tvDateToShow.setText(DateTimeUtils.dateTimeFormat.format(((Event) entity).getDateFinishEvent()));
@@ -217,6 +270,25 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
                 timePickerDialog.show();
             });
         } else {
+            if (entity.getImage() != null) {
+                schoolApi.downloadImage(entity.getId()).enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.body() != null) {
+                            InputStream inputStream = response.body().byteStream();
+                            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                            if (bitmap != null) {
+                                holder.ivAvatar.setImageBitmap(bitmap);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                    }
+                });
+            }
             holder.tvRole.setText(SCHOOL.toUpperCase());
             holder.bDate.setVisibility(View.INVISIBLE);
             holder.bDateTo.setVisibility(View.INVISIBLE);
@@ -253,25 +325,22 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         holder.bSave.setOnClickListener(v -> {
             AbstractBaseEntity entityForUpdate = updateEntityForSave(entity, holder);
             if (entity instanceof Event) {
-                saveEvent((Event) entityForUpdate);
+                saveEvent((Event) entityForUpdate, holder.bitmap);
             } else {
-                saveSchool((School) entityForUpdate);
+                saveSchool((School) entityForUpdate, holder.bitmap);
             }
         });
 
-        holder.ivAvatar.setOnClickListener(v -> {
-            setImage(holder.ivAvatar);
-        });
     }
 
-    private void editDescription(TextView tvDescription) {
+    private void editDescription(TextView tvDescription, String description) {
         LayoutInflater inflater = LayoutInflater.from(activity);
         View viewForDialog = inflater.inflate(R.layout.dialog_write_description, null);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
-        alertDialog.setTitle("About myself");
+        alertDialog.setTitle("Description");
         alertDialog.setView(viewForDialog);
         EditText etDescription = viewForDialog.findViewById(R.id.etDescription);
-
+        etDescription.setText(description);
         alertDialog.setPositiveButton("OK", (dialog, which) ->{
             tvDescription.setText(etDescription.getText().toString());
         });
@@ -279,14 +348,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         alertDialog.show();
     }
 
-    private void setImage(ImageView ivImage) {
-        imagePassListener.uploadPicture();
-        if (activity.getImage() != null) {
-            ivImage.setImageURI(activity.getImage());
-        }
-    }
-
-    private void saveSchool(School school) {
+    private void saveSchool(School school, Bitmap bitmap) {
         activity.getPbConnect().setVisibility(View.VISIBLE);
         schoolApi.updateSchool(school).enqueue(new Callback<School>() {
             @Override
@@ -294,7 +356,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
                 School newSchool = response.body();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
                 if (newSchool != null) {
-                    uploadSchoolImage(newSchool.getId());
+                    uploadSchoolImage(newSchool.getId(), bitmap);
                     Toast toast = Toast.makeText(activity, "School saved", Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
                     toast.show();
@@ -311,7 +373,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         });
     }
 
-    private void saveEvent(Event event) {
+    private void saveEvent(Event event, Bitmap bitmap) {
         activity.getPbConnect().setVisibility(View.VISIBLE);
         eventApi.updateEvent(event).enqueue(new Callback<Event>() {
             @Override
@@ -319,7 +381,7 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
                 Event newEvent = response.body();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
                 if (newEvent != null) {
-                    uploadEventImage(newEvent.getId());
+                    uploadEventImage(newEvent.getId(), bitmap);
                     Toast toast = Toast.makeText(activity, "Event saved", Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
                     toast.show();
@@ -336,16 +398,18 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         });
     }
 
-    private void uploadSchoolImage(Integer id) {
-        if (activity.getImage() != null) {
-
-            File image = new File(getPath(activity.getImage(), activity));
-            byte[] byteArray = getCompressImage(getPath(activity.getImage(), activity));
+    private void uploadSchoolImage(Integer id, Bitmap bitmap) {
+        if (bitmap != null) {
+            int randomNameImage = (int) (Math.random() * 2_000_000_000);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 20, stream);
+            byte[] byteArray = stream.toByteArray();
             RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), byteArray);
-            MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", image.getName(), requestBody);
+            MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", randomNameImage + ".jpg", requestBody);
             schoolApi.uploadImage(id, fileToUpload).enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
+                    Log.d("log", response.body());
                     activity.setImage(null);
                 }
 
@@ -357,16 +421,20 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         }
     }
 
-    private void uploadEventImage(Integer id) {
-        if (activity.getImage() != null) {
+    private void uploadEventImage(Integer id, Bitmap bitmap) {
+        if (bitmap != null) {
 
-            File image = new File(getPath(activity.getImage(), activity));
-            byte[] byteArray = getCompressImage(getPath(activity.getImage(), activity));
+            int randomNameImage = (int) (Math.random() * 2_000_000_000);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 20, stream);
+            byte[] byteArray = stream.toByteArray();
             RequestBody requestBody = RequestBody.create(MediaType.parse("multipart/form-data"), byteArray);
-            MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", image.getName(), requestBody);
+            MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file", randomNameImage + ".jpg", requestBody);
+            Log.d("log", "uploadEventImage" + fileToUpload.toString());
             eventApi.uploadImage(id, fileToUpload).enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
+                    Log.d("log", response.body());
                     activity.setImage(null);
                 }
 
@@ -530,12 +598,13 @@ public class SchoolsAndEventsRVAdapter extends RecyclerView.Adapter<SchoolsAndEv
         private CheckBox cbMerenge;
         private CheckBox cbReggaeton;
         private CheckBox cbTango;
+        private Bitmap bitmap;
 
         public SchoolsAndEventsRecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
             etName = itemView.findViewById(R.id.etName);
             etPhone = itemView.findViewById(R.id.etPhone);
-            tvDescription = itemView.findViewById(R.id.etDescription);
+            tvDescription = itemView.findViewById(R.id.tvDescription);
             tvDateShow = itemView.findViewById(R.id.tvDateShow);
             bDate = itemView.findViewById(R.id.bDate);
             etCountry = itemView.findViewById(R.id.etCountry);

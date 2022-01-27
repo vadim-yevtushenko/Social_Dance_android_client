@@ -8,8 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class NetworkService {
-//    public static final String BASE_URL = "http://192.168.1.100:8080/";
-    public static final String BASE_URL = "https://social-dance.herokuapp.com/";
+    public static final String BASE_URL = "http://192.168.1.100:8080/";
+//    public static final String BASE_URL = "https://social-dance.herokuapp.com/";
     private static NetworkService networkService;
     private Retrofit retrofit;
 

@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -103,9 +104,13 @@ public class FragmentProfile extends Fragment {
             @Override
             public void onFailure(Call<Dancer> call, Throwable t) {
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
-                Toast toast = Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
-                toast.show();
+                try {
+                    Toast toast = Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -231,14 +236,23 @@ public class FragmentProfile extends Fragment {
 
                             @Override
                             public void onFailure(Call<String> call, Throwable t) {
-                                Log.d("log", "onFailure " + t.toString());
                             }
                         });
                     }
                 }).
                 setNegativeButton("DELETE", (dialog, which) -> {
                     activity.setImage(null);
-                    profileRVAdapter.notifyDataSetChanged();
+                    dancerApi.deleteImage(id).enqueue(new Callback<Void>() {
+                        @Override
+                        public void onResponse(Call<Void> call, Response<Void> response) {
+                            profileRVAdapter.notifyDataSetChanged();
+                        }
+
+                        @Override
+                        public void onFailure(Call<Void> call, Throwable t) {
+
+                        }
+                    });
                 }).
                 setNeutralButton("CANCEL", (dialog, which) -> {
                 });
@@ -263,12 +277,79 @@ public class FragmentProfile extends Fragment {
         if (itemId == R.id.itemAbout) {
             AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
             alertDialog.setTitle("About the application");
-            alertDialog.setMessage("\nversion: 0.1");
+            alertDialog.setMessage("\nversion: 1.0");
             alertDialog.setPositiveButton("OK", (dialog, which) -> {
             });
             alertDialog.show();
+        } else if (itemId == R.id.itemChangePassword){
+            dialogForChangePassword();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void dialogForChangePassword() {
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        View viewForDialog = inflater.inflate(R.layout.dialog_change_password, null);
+        EditText etDialogOldPassword = viewForDialog.findViewById(R.id.etDialogOldPassword);
+        EditText etDialogNewPassword1 = viewForDialog.findViewById(R.id.etDialogNewPassword1);
+        EditText etDialogNewPassword2 = viewForDialog.findViewById(R.id.etDialogNewPassword2);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+        alertDialog.setTitle("Change password");
+        alertDialog.setPositiveButton("OK", (dialog, which) ->{
+            changePassword(etDialogOldPassword.toString(),
+                    etDialogNewPassword1.toString(),
+                    etDialogNewPassword2.toString());
+        });
+
+        alertDialog.setNeutralButton("CANCEL", (dialog, which) -> {});
+
+        alertDialog.show();
+    }
+
+    private void changePassword(String oldPassword, String newPassword1, String newPassword2) {
+        dancerApi.checkSignInByEmailAndPassword(dancer.getEntityInfo().getEmail(),oldPassword).enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                Integer id = response.body();
+                if (id == null || id < 1){
+                    Toast toast = Toast.makeText(getActivity(), "Wrong old password", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
+                    dialogForChangePassword();
+                } else if (!newPassword1.equals(newPassword2)) {
+                    Toast toast = Toast.makeText(getActivity(), "Password 1 and password 2 do not match", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
+                    dialogForChangePassword();
+                }else {
+                    dancerApi.changePassword(dancer.getEntityInfo().getEmail(), newPassword1).enqueue(new Callback<String>() {
+                        @Override
+                        public void onResponse(Call<String> call, Response<String> response) {
+                            if (response.body().equals("changed")){
+                                Toast toast = Toast.makeText(getActivity(), "Password changed successfully", Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                                toast.show();
+                            }else {
+                                Toast toast = Toast.makeText(getActivity(), "Password not changed", Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                                toast.show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<String> call, Throwable t) {
+
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+
+            }
+        });
+
     }
 
     public boolean isTeacher(){

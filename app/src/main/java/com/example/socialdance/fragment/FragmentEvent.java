@@ -1,15 +1,20 @@
 package com.example.socialdance.fragment;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -27,9 +32,11 @@ import com.example.socialdance.retrofit.EventApi;
 import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.utils.DateTimeUtils;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -41,6 +48,7 @@ public class FragmentEvent extends Fragment {
     private int id;
     private MainActivity activity;
     private ImageView ivBack;
+    private ImageView ivAvatar;
 
     private TextView tvEventName;
     private TextView tvEventDescription;
@@ -76,6 +84,7 @@ public class FragmentEvent extends Fragment {
 
         ivBack.setOnClickListener(this::back);
         tvEventDescription.setOnClickListener(this::showDescription);
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -137,6 +146,30 @@ public class FragmentEvent extends Fragment {
 
     private void fillForm() {
 
+        if (event.getImage() != null) {
+            eventApi.downloadImage(event.getId()).enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.body() != null) {
+                        InputStream inputStream = response.body().byteStream();
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap != null) {
+                            ivAvatar.setImageBitmap(bitmap);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                }
+            });
+        } else {
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) ivAvatar.getLayoutParams();
+            params.height = 1;
+            ivAvatar.setLayoutParams(params);
+        }
+
         if (event != null) {
             tvEventName.setText(event.getName());
             tvEventDescription.setText(event.getDescription());
@@ -189,6 +222,7 @@ public class FragmentEvent extends Fragment {
 
     private void initViews(View view) {
         ivBack = view.findViewById(R.id.ivBack);
+        ivAvatar = view.findViewById(R.id.ivAvatar);
         tvEventName = view.findViewById(R.id.tvEventName);
         tvEventDescription = view.findViewById(R.id.tvEventDescription);
         tvEventAddress = view.findViewById(R.id.tvEventAddress);
@@ -197,5 +231,10 @@ public class FragmentEvent extends Fragment {
         tvEventDances = view.findViewById(R.id.tvEventDances);
     }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
+    }
 
 }

@@ -1,15 +1,20 @@
 package com.example.socialdance.fragment;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -28,8 +33,10 @@ import com.example.socialdance.retrofit.DancerApi;
 import com.example.socialdance.retrofit.NetworkService;
 import com.example.socialdance.retrofit.SchoolApi;
 
+import java.io.InputStream;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -44,6 +51,7 @@ public class FragmentSchool extends Fragment {
     private SchoolForReviewPassListener passListener;
 
     private ImageView ivBack;
+    private ImageView ivAvatar;
     private TextView tvSchoolName;
     private TextView tvSchoolDescription;
     private TextView tvSchoolAddress;
@@ -80,6 +88,7 @@ public class FragmentSchool extends Fragment {
         bReviews.setOnClickListener(this::reviews);
         ivBack.setOnClickListener(this::back);
         tvSchoolDescription.setOnClickListener(this::showDescription);
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -143,11 +152,36 @@ public class FragmentSchool extends Fragment {
     }
 
     private void fillForm() {
+        if (school.getImage() != null) {
+            schoolApi.downloadImage(school.getId()).enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.body() != null) {
+                        InputStream inputStream = response.body().byteStream();
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        if (bitmap != null) {
+                            ivAvatar.setImageBitmap(bitmap);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                }
+            });
+        } else {
+            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) ivAvatar.getLayoutParams();
+            params.height = 1;
+            ivAvatar.setLayoutParams(params);
+        }
         tvSchoolName.setText(school.getName());
         tvSchoolDescription.setText(school.getDescription());
         tvSchoolAddress.setText(getStringAddress(school.getEntityInfo()));
-        ratingBar.setRating(school.getRating().getAverageRating());
-        tvSchoolRating.setText("rating count: " + school.getRating().getRatingCount());
+        if (school.getRating() != null) {
+            ratingBar.setRating(school.getRating().getAverageRating());
+            tvSchoolRating.setText("rating count: " + school.getRating().getRatingCount());
+        }
         tvSchoolDances.setText(getStringListDances(school.getDances()));
         tvOwner.setText("");
     }
@@ -182,6 +216,7 @@ public class FragmentSchool extends Fragment {
 
     private void initViews(View view) {
         ivBack = view.findViewById(R.id.ivBack);
+        ivAvatar = view.findViewById(R.id.ivAvatar);
         tvSchoolName = view.findViewById(R.id.tvSchoolName);
         tvSchoolDescription = view.findViewById(R.id.tvSchoolDescription);
         tvSchoolAddress = view.findViewById(R.id.tvSchoolAddress);
@@ -191,6 +226,12 @@ public class FragmentSchool extends Fragment {
         bReviews = view.findViewById(R.id.bReviews);
         ratingBar = view.findViewById(R.id.ratingBar);
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     public interface SchoolForReviewPassListener{

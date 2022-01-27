@@ -65,8 +65,8 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
     public ProfileRecyclerViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
         activity = (MainActivity) parent.getContext();
-        spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, Role.values());
-        LayoutInflater inflater = LayoutInflater.from(context);
+        spinnerAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, Role.values());
+        LayoutInflater inflater = LayoutInflater.from(activity);
         View view = inflater.inflate(R.layout.profile_item, parent, false);
 
         return new ProfileRecyclerViewHolder(view);
@@ -101,7 +101,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         });
 
         holder.tvDescription.setOnClickListener(v -> {
-            editDescription(holder.tvDescription);
+            editDescription(holder.tvDescription, dancer.getDescription());
         });
 
         holder.spRole.setAdapter(spinnerAdapter);
@@ -181,14 +181,14 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         holder.bSchoolAndEvents.setOnClickListener(v -> activity.setFragmentSchoolsAndEvents());
     }
 
-    private void editDescription(TextView tvDescription) {
+    private void editDescription(TextView tvDescription, String description) {
         LayoutInflater inflater = LayoutInflater.from(activity);
         View viewForDialog = inflater.inflate(R.layout.dialog_write_description, null);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
         alertDialog.setTitle("About myself");
         alertDialog.setView(viewForDialog);
         EditText etDescription = viewForDialog.findViewById(R.id.etDescription);
-
+        etDescription.setText(description);
         alertDialog.setPositiveButton("OK", (dialog, which) ->{
             tvDescription.setText(etDescription.getText().toString());
         });

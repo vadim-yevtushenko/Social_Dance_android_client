@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,8 +12,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -73,16 +77,15 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
         View view = inflater.inflate(R.layout.fragment_create_school_or_event, container, false);
         initViews(view);
         createRecyclerView();
-        holder = adapter.getSchoolOrEventRVHolder();
 
-        initListeners();
         ivSave.setOnClickListener(this::create);
         ivBack.setOnClickListener(this::back);
+        setHasOptionsMenu(true);
         return view;
     }
 
     private void createRecyclerView() {
-        adapter = new CreateSchoolOrEventRVAdapter();
+        adapter = new CreateSchoolOrEventRVAdapter(this);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         rvCreateSchoolOrEvent.setLayoutManager(linearLayoutManager);
         rvCreateSchoolOrEvent.setAdapter(adapter);
@@ -94,12 +97,12 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
     }
 
     private void create(View view) {
+        holder = adapter.getSchoolOrEventRVHolder();
         if (holder.getSpRole().getSelectedItem().equals(adapter.getEVENT())) {
             createEvent();
         } else if (holder.getSpRole().getSelectedItem().equals(adapter.getSCHOOL())) {
             createSchool();
         }
-
     }
 
     private void createSchool() {
@@ -152,7 +155,9 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
             schoolApi.uploadImage(id, fileToUpload).enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
+                    Log.d("log", "onResponse " + response.body());
                     activity.setImage(null);
+                    activity.setProfile();
                 }
 
                 @Override
@@ -254,7 +259,9 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
             eventApi.uploadImage(id, fileToUpload).enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(Call<String> call, Response<String> response) {
+                    Log.d("log", "onResponse " + response.body());
                     activity.setImage(null);
+                    activity.setProfile();
                 }
 
                 @Override
@@ -305,22 +312,17 @@ public class FragmentCreateSchoolOrEvent extends Fragment {
         return event;
     }
 
-    private void initListeners() {
-        holder.getIvAvatar().setOnClickListener(v -> setImage());
-    }
-
-    private void setImage() {
-        imagePassListener.uploadPicture();
-        if (activity.getImage() != null) {
-            holder.getIvAvatar().setImageURI(activity.getImage());
-        }
-    }
-
     private void initViews(@NonNull View view) {
 
         ivSave = view.findViewById(R.id.ivSave);
         ivBack = view.findViewById(R.id.ivBack);
         rvCreateSchoolOrEvent = view.findViewById(R.id.rvCreateSchoolOrEvent);
 
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }

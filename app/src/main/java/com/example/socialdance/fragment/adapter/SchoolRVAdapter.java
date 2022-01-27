@@ -82,8 +82,10 @@ public class SchoolRVAdapter extends RecyclerView.Adapter<SchoolRVAdapter.School
         holder.tvName.setText(school.getName());
         holder.tvDescription.setText(school.getDescription());
         holder.tvCity.setText(school.getEntityInfo().getCity());
-        holder.ratingBar.setRating(school.getRating().getAverageRating());
-        holder.tvRating.setText("rating count: " + school.getRating().getRatingCount());
+        if (school.getRating() != null) {
+            holder.ratingBar.setRating(school.getRating().getAverageRating());
+            holder.tvRating.setText("rating count: " + school.getRating().getRatingCount());
+        }
         holder.schoolItemLayout.setOnClickListener(v -> {
             passListener.passSchoolId(school.getId());
         });

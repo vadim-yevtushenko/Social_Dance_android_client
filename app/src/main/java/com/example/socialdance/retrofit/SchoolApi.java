@@ -57,6 +57,9 @@ public interface SchoolApi {
     @GET("schools/download-image")
     Call<ResponseBody> downloadImage (@Query("id") Integer id);
 
+    @DELETE("schools/delete-image")
+    Call<Void> deleteImage(@Query("id") Integer id);
+
     @DELETE("schools/{id}")
     Call<Void> deleteSchool(@Path("id") Integer id);
 }

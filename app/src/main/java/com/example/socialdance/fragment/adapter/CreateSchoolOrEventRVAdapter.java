@@ -3,6 +3,7 @@ package com.example.socialdance.fragment.adapter;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +20,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.socialdance.MainActivity;
 import com.example.socialdance.R;
+import com.example.socialdance.fragment.FragmentCreateSchoolOrEvent;
+import com.example.socialdance.fragment.ImagePassListener;
 import com.example.socialdance.model.AbstractBaseEntity;
+import com.example.socialdance.model.Event;
 import com.example.socialdance.utils.DateTimeUtils;
 
 import java.text.ParseException;
@@ -32,7 +37,9 @@ import java.util.List;
 
 public class CreateSchoolOrEventRVAdapter extends RecyclerView.Adapter<CreateSchoolOrEventRVAdapter.CreateSchoolOrEventRVHolder> {
 
-    private Context context;
+    private MainActivity activity;
+    private FragmentCreateSchoolOrEvent fragmentCreateSchoolOrEvent;
+    private ImagePassListener imagePassListener;
     private List<AbstractBaseEntity> entityList;
     private CreateSchoolOrEventRVHolder schoolOrEventRVHolder;
 
@@ -43,25 +50,53 @@ public class CreateSchoolOrEventRVAdapter extends RecyclerView.Adapter<CreateSch
     private Date dateStart;
     private Date dateFinish;
 
-    public CreateSchoolOrEventRVAdapter() {
+    public CreateSchoolOrEventRVAdapter(FragmentCreateSchoolOrEvent fragmentCreateSchoolOrEvent) {
+        this.fragmentCreateSchoolOrEvent = fragmentCreateSchoolOrEvent;
         entityList = new ArrayList<>();
+        entityList.add(new Event());
     }
 
     @NonNull
     @Override
     public CreateSchoolOrEventRVHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
-        String[] roles = {EVENT, SCHOOL};
-        spinnerAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_dropdown_item, roles);
 
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.profile_item, parent, false);
+        activity = (MainActivity) parent.getContext();
+        imagePassListener = activity;
+        String[] roles = {EVENT, SCHOOL};
+        spinnerAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_dropdown_item, roles);
+
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        View view = inflater.inflate(R.layout.create_school_or_event_item, parent, false);
         return new CreateSchoolOrEventRVHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CreateSchoolOrEventRVAdapter.CreateSchoolOrEventRVHolder holder, int position) {
         this.schoolOrEventRVHolder = holder;
+
+        holder.ivAvatar.setOnClickListener(v -> {
+            Button button = new Button(activity);
+            button.setText("Open gallery");
+            button.setOnClickListener(v1 -> {
+                imagePassListener.uploadPicture();
+            });
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity).
+                    setTitle("\t\t\t\t\t\tSet the avatar!").
+                    setView(button).
+                    setPositiveButton("OK", (dialog, which) -> {
+                        if (activity.getImage() != null) {
+                            holder.ivAvatar.setImageURI(activity.getImage());
+                        }
+                    }).
+                    setNegativeButton("DELETE", (dialog, which) -> {
+                        activity.setImage(null);
+                        holder.ivAvatar.setImageResource(R.drawable.plug);
+                    }).
+                    setNeutralButton("CANCEL", (dialog, which) -> {
+                    });
+            alertDialog.show();
+        });
+        holder.ivAvatar.setImageResource(R.drawable.plug);
 
         holder.getSpRole().setAdapter(spinnerAdapter);
         holder.spRole.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -95,7 +130,7 @@ public class CreateSchoolOrEventRVAdapter extends RecyclerView.Adapter<CreateSch
             StringBuilder dateBuilder = new StringBuilder();
             StringBuilder timeBuilder = new StringBuilder();
             DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    context,
+                    activity,
                     (DatePickerDialog.OnDateSetListener) (view1, year, month, dayOfMonth) -> {
                         Integer m = (month + 1);
                         String monthStr = String.valueOf(m).length() > 1 ? String.valueOf(m) : "0" + m;
@@ -116,7 +151,7 @@ public class CreateSchoolOrEventRVAdapter extends RecyclerView.Adapter<CreateSch
 
             );
             TimePickerDialog timePickerDialog = new TimePickerDialog(
-                    context,
+                    activity,
                     (view, hourOfDay, minute) -> {
                         timeBuilder.append(" ").
                                 append(String.valueOf(hourOfDay).length() == 1 ? "0" + hourOfDay : hourOfDay).
@@ -136,7 +171,7 @@ public class CreateSchoolOrEventRVAdapter extends RecyclerView.Adapter<CreateSch
             StringBuilder dateBuilder = new StringBuilder();
             StringBuilder timeBuilder = new StringBuilder();
             DatePickerDialog datePickerDialog = new DatePickerDialog(
-                    context,
+                    activity,
                     (DatePickerDialog.OnDateSetListener) (view1, year, month, dayOfMonth) -> {
                         Integer m = (month + 1);
                         String monthStr = String.valueOf(m).length() > 1 ? String.valueOf(m) : "0" + m;
@@ -157,7 +192,7 @@ public class CreateSchoolOrEventRVAdapter extends RecyclerView.Adapter<CreateSch
 
             );
             TimePickerDialog timePickerDialog = new TimePickerDialog(
-                    context,
+                    activity,
                     (view, hourOfDay, minute) -> {
                         timeBuilder.append(" ").
                                 append(String.valueOf(hourOfDay).length() == 1 ? "0" + hourOfDay : hourOfDay).
@@ -175,14 +210,14 @@ public class CreateSchoolOrEventRVAdapter extends RecyclerView.Adapter<CreateSch
 
     @Override
     public int getItemCount() {
-        return 0;
+        return entityList.size();
     }
 
     private void editDescription(TextView tvDescription) {
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(activity);
         View viewForDialog = inflater.inflate(R.layout.dialog_write_description, null);
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context);
-        alertDialog.setTitle("About myself");
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+        alertDialog.setTitle("Description");
         alertDialog.setView(viewForDialog);
         EditText etDescription = viewForDialog.findViewById(R.id.etDescription);
 

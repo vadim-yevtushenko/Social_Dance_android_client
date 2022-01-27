@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -67,8 +69,8 @@ public class FragmentSchoolsAndEvents extends Fragment {
         entityList = new ArrayList<>();
         createSchoolsAndEventsRecyclerView();
         downloadSchool();
-//        downloadEvents();
         ivBack.setOnClickListener(this::back);
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -106,9 +108,7 @@ public class FragmentSchoolsAndEvents extends Fragment {
                 if (events != null) {
                     entityList.addAll(events);
                 }
-
                 schoolsAndEventsRVAdapter.notifyDataSetChanged();
-
             }
 
             @Override
@@ -138,7 +138,9 @@ public class FragmentSchoolsAndEvents extends Fragment {
         rvSchoolsAndEvents = view.findViewById(R.id.rvSchoolsAndEvents);
     }
 
-    public int getOwnerId() {
-        return ownerId;
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }

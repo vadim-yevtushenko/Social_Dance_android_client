@@ -308,7 +308,7 @@
         android:layout_width="325dp"
         android:layout_height="22dp"
         android:layout_marginTop="28dp"
-        android:text="About myself"
+        android:text="Description"
         android:textColor="#305AED"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"

@@ -84,9 +84,13 @@ public class FragmentSchoolsList extends Fragment {
             @Override
             public void onFailure(Call<List<School>> call, Throwable t) {
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
-                Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
-                toast.show();
+                try {
+                    Toast toast = Toast.makeText(activity, "Error connection", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }

@@ -88,9 +88,13 @@ public class FragmentDancersList extends Fragment {
             @Override
             public void onFailure(Call<List<Dancer>> call, Throwable t) {
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
-                Toast toast = Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
-                toast.show();
+                try {
+                    Toast toast = Toast.makeText(getActivity(), "Error connection", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -106,8 +110,8 @@ public class FragmentDancersList extends Fragment {
 
     private void initViews(View view) {
         rvDancersList = view.findViewById(R.id.rvDancersList);
-//        etForSearch = new EditText(view.getContext());
-//        etForSearch2 = new EditText(view.getContext());
+        etForSearch = new EditText(view.getContext());
+        etForSearch2 = new EditText(view.getContext());
     }
 
     @Override

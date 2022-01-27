@@ -43,6 +43,9 @@ public interface DancerApi {
     @GET("dancers/download-image")
     Call<ResponseBody> downloadImage (@Query("id") Integer id);
 
+    @DELETE("dancers/delete-image")
+    Call<Void> deleteImage(@Query("id") Integer id);
+
     @DELETE("dancers/{id}")
     Call<Void> deleteDancer(@Path("id") Integer id);
 
@@ -51,5 +54,8 @@ public interface DancerApi {
 
     @GET("dancers/identification")
     Call<Integer> checkSignInByEmailAndPassword(@Query("email") String email, @Query("password") String password);
+
+    @GET("dancers/change-password")
+    Call<String> changePassword(@Query("email") String email, @Query("password") String password);
 
 }

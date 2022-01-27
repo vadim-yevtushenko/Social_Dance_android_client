@@ -43,6 +43,9 @@ public interface EventApi {
     @GET("events/download-image")
     Call<ResponseBody> downloadImage (@Query("id") Integer id);
 
+    @DELETE("events/delete-image")
+    Call<Void> deleteImage(@Query("id") Integer id);
+
     @DELETE("events/{id}")
     Call<Void> deleteEvent(@Path("id") Integer id);
 }

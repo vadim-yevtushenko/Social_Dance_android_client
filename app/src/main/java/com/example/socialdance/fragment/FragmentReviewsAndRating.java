@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -95,6 +97,7 @@ public class FragmentReviewsAndRating extends Fragment {
         bSend.setOnClickListener(this::sendReview);
         bSendRating.setOnClickListener(this::sendRating);
         ivBack.setOnClickListener(this::back);
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -126,8 +129,10 @@ public class FragmentReviewsAndRating extends Fragment {
                 school = response.body();
                 activity.getPbConnect().setVisibility(View.INVISIBLE);
                 if (school != null) {
-                    ratingBar.setRating(school.getRating().getAverageRating());
-                    tvRating.setText("rating count: " + school.getRating().getRatingCount());
+                    if (school.getRating() != null) {
+                        ratingBar.setRating(school.getRating().getAverageRating());
+                        tvRating.setText("rating count: " + school.getRating().getRatingCount());
+                    }
                     tvSchoolName.setText(school.getName());
                 }
 
@@ -244,5 +249,11 @@ public class FragmentReviewsAndRating extends Fragment {
         tvSchoolName = view.findViewById(R.id.tvSchoolName);
         cbIncognito = view.findViewById(R.id.cbIncognito);
         ratingBar = view.findViewById(R.id.ratingBar);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
     }
 }
