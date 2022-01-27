@@ -295,10 +295,11 @@ public class FragmentProfile extends Fragment {
         EditText etDialogNewPassword2 = viewForDialog.findViewById(R.id.etDialogNewPassword2);
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
         alertDialog.setTitle("Change password");
+        alertDialog.setView(viewForDialog);
         alertDialog.setPositiveButton("OK", (dialog, which) ->{
-            changePassword(etDialogOldPassword.toString(),
-                    etDialogNewPassword1.toString(),
-                    etDialogNewPassword2.toString());
+            changePassword(etDialogOldPassword.getText().toString(),
+                    etDialogNewPassword1.getText().toString(),
+                    etDialogNewPassword2.getText().toString());
         });
 
         alertDialog.setNeutralButton("CANCEL", (dialog, which) -> {});
@@ -307,48 +308,54 @@ public class FragmentProfile extends Fragment {
     }
 
     private void changePassword(String oldPassword, String newPassword1, String newPassword2) {
-        dancerApi.checkSignInByEmailAndPassword(dancer.getEntityInfo().getEmail(),oldPassword).enqueue(new Callback<Integer>() {
-            @Override
-            public void onResponse(Call<Integer> call, Response<Integer> response) {
-                Integer id = response.body();
-                if (id == null || id < 1){
-                    Toast toast = Toast.makeText(getActivity(), "Wrong old password", Toast.LENGTH_LONG);
-                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
-                    toast.show();
-                    dialogForChangePassword();
-                } else if (!newPassword1.equals(newPassword2)) {
-                    Toast toast = Toast.makeText(getActivity(), "Password 1 and password 2 do not match", Toast.LENGTH_LONG);
-                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
-                    toast.show();
-                    dialogForChangePassword();
-                }else {
-                    dancerApi.changePassword(dancer.getEntityInfo().getEmail(), newPassword1).enqueue(new Callback<String>() {
-                        @Override
-                        public void onResponse(Call<String> call, Response<String> response) {
-                            if (response.body().equals("changed")){
-                                Toast toast = Toast.makeText(getActivity(), "Password changed successfully", Toast.LENGTH_LONG);
-                                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
-                                toast.show();
-                            }else {
-                                Toast toast = Toast.makeText(getActivity(), "Password not changed", Toast.LENGTH_LONG);
+        if (newPassword1.length() < 3) {
+            Toast toast = Toast.makeText(getActivity(), "New password too short", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+            toast.show();
+            dialogForChangePassword();
+        }else if (!newPassword1.equals(newPassword2)){
+            Toast toast = Toast.makeText(getActivity(), "Password 1 and password 2 do not match", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+            toast.show();
+            dialogForChangePassword();
+        }else {
+            dancerApi.checkSignInByEmailAndPassword(dancer.getEntityInfo().getEmail(), oldPassword).enqueue(new Callback<Integer>() {
+                @Override
+                public void onResponse(Call<Integer> call, Response<Integer> response) {
+                    Integer id = response.body();
+                    if (id == null || id < 1) {
+                        Toast toast = Toast.makeText(getActivity(), "Wrong old password", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                        toast.show();
+                        dialogForChangePassword();
+                    } else {
+                        dancerApi.changePassword(dancer.getEntityInfo().getEmail(), newPassword1).enqueue(new Callback<String>() {
+                            @Override
+                            public void onResponse(Call<String> call, Response<String> response) {
+                                Toast toast;
+                                if (response.body().equals("changed")) {
+                                    toast = Toast.makeText(getActivity(), "Password changed successfully", Toast.LENGTH_LONG);
+                                } else {
+                                    toast = Toast.makeText(getActivity(), "Password not changed", Toast.LENGTH_LONG);
+                                }
                                 toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
                                 toast.show();
                             }
-                        }
 
-                        @Override
-                        public void onFailure(Call<String> call, Throwable t) {
+                            @Override
+                            public void onFailure(Call<String> call, Throwable t) {
 
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<Integer> call, Throwable t) {
+                @Override
+                public void onFailure(Call<Integer> call, Throwable t) {
 
-            }
-        });
+                }
+            });
+        }
 
     }
 
