@@ -137,7 +137,8 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
 
         holder.etCity.setText(dancer.getEntityInfo().getCity());
         holder.etPhone.setText(dancer.getEntityInfo().getPhoneNumber());
-        holder.etEmail.setText(dancer.getEntityInfo().getEmail());
+        holder.tvEmail.setText(dancer.getEntityInfo().getEmail());
+
         if (dancer.getSex() == null || dancer.getSex().equals("male")) {
             holder.rbMale.setChecked(true);
         } else {
@@ -273,7 +274,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
         private TextView tvDescription;
         private EditText etCity;
         private EditText etPhone;
-        private EditText etEmail;
+        private TextView tvEmail;
         private TextView tvBirthdayShow;
         private Button bBirthday;
         private Button bCreate;
@@ -304,7 +305,7 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             bBirthday = itemView.findViewById(R.id.bDate);
             etCity = itemView.findViewById(R.id.etCity);
             etPhone = itemView.findViewById(R.id.etPhone);
-            etEmail = itemView.findViewById(R.id.etEmail);
+            tvEmail = itemView.findViewById(R.id.tvEmail);
             bCreate = itemView.findViewById(R.id.bCreate);
             bDelete = itemView.findViewById(R.id.bDelete);
             bExit = itemView.findViewById(R.id.bExit);
@@ -329,8 +330,8 @@ public class ProfileRVAdapter extends RecyclerView.Adapter<ProfileRVAdapter.Prof
             return etPhone;
         }
 
-        public EditText getEtEmail() {
-            return etEmail;
+        public TextView getTvEmail() {
+            return tvEmail;
         }
 
         public EditText getEtName() {

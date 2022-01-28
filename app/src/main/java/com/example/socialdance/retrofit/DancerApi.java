@@ -55,7 +55,10 @@ public interface DancerApi {
     @GET("dancers/identification")
     Call<Integer> checkSignInByEmailAndPassword(@Query("email") String email, @Query("password") String password);
 
-    @GET("dancers/change-password")
-    Call<String> changePassword(@Query("email") String email, @Query("password") String password);
+    @POST("dancers/change-password")
+    Call<Boolean> changePassword(@Query("email") String email, @Query("password") String password);
+
+    @POST("dancers/change-email")
+    Call<Boolean> changeEmail(@Query("oldEmail") String oldEmail, @Query("newEmail") String newEmail);
 
 }

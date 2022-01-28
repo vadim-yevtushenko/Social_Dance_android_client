@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -122,6 +123,10 @@ public class FragmentProfile extends Fragment {
     }
 
     private void save(View view) {
+        saveDancer();
+    }
+
+    private void saveDancer() {
         createDancerForSave();
         activity.getPbConnect().setVisibility(View.VISIBLE);
         dancerApi.updateDancer(dancer).enqueue(new Callback<Dancer>() {
@@ -161,7 +166,7 @@ public class FragmentProfile extends Fragment {
         dancer.setDescription(holder.getTvDescription().getText().toString());
         dancer.getEntityInfo().setCity(holder.getEtCity().getText().toString());
         dancer.getEntityInfo().setPhoneNumber(holder.getEtPhone().getText().toString());
-        dancer.getEntityInfo().setEmail(holder.getEtEmail().getText().toString());
+        dancer.getEntityInfo().setEmail(holder.getTvEmail().getText().toString());
         if (holder.getRbMale().isChecked()) {
             dancer.setSex("male");
         } else {
@@ -283,6 +288,8 @@ public class FragmentProfile extends Fragment {
             alertDialog.show();
         } else if (itemId == R.id.itemChangePassword){
             dialogForChangePassword();
+        } else if (itemId == R.id.itemChangeEmail){
+            dialogForChangeEmail();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -307,6 +314,60 @@ public class FragmentProfile extends Fragment {
         alertDialog.show();
     }
 
+    public void dialogForChangeEmail(){
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        View viewForDialog = inflater.inflate(R.layout.dialog_write_description, null);
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(activity);
+        alertDialog.setTitle("Change email");
+        alertDialog.setView(viewForDialog);
+        EditText etEmail = viewForDialog.findViewById(R.id.etDescription);
+        etEmail.setHint("New email");
+        etEmail.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        alertDialog.setPositiveButton("OK", (dialog, which) ->{
+            changeEmail(etEmail.getText().toString());
+        });
+
+        alertDialog.setNeutralButton("CANCEL", (dialog, which) -> {});
+
+        alertDialog.show();
+    }
+
+    private void changeEmail(String newEmail) {
+        if (newEmail.length() < 5){
+            Toast toast = Toast.makeText(getActivity(), "New email is wrong", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+            toast.show();
+            dialogForChangeEmail();
+        }else {
+            dancerApi.changeEmail(dancer.getEntityInfo().getEmail(), newEmail).enqueue(new Callback<Boolean>() {
+                @Override
+                public void onResponse(Call<Boolean> call, Response<Boolean> response) {
+                    if (response.body() != null) {
+                        if (response.body()){
+                            profileRVAdapter.getHolderGlobal().getTvEmail().setText(newEmail);
+                            saveDancer();
+                        }else {
+                            Toast toast = Toast.makeText(getActivity(), "Email not changed.\nSuch email already exists", Toast.LENGTH_LONG);
+                            toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                            toast.show();
+                        }
+                    }else {
+                        Toast toast = Toast.makeText(getActivity(), "Email not changed", Toast.LENGTH_LONG);
+                        toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                        toast.show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Boolean> call, Throwable t) {
+                    Toast toast = Toast.makeText(getActivity(), "Email not changed.\nError connection", Toast.LENGTH_LONG);
+                    toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                    toast.show();
+                }
+            });
+        }
+    }
+
     private void changePassword(String oldPassword, String newPassword1, String newPassword2) {
         if (newPassword1.length() < 3) {
             Toast toast = Toast.makeText(getActivity(), "New password too short", Toast.LENGTH_LONG);
@@ -329,11 +390,11 @@ public class FragmentProfile extends Fragment {
                         toast.show();
                         dialogForChangePassword();
                     } else {
-                        dancerApi.changePassword(dancer.getEntityInfo().getEmail(), newPassword1).enqueue(new Callback<String>() {
+                        dancerApi.changePassword(dancer.getEntityInfo().getEmail(), newPassword1).enqueue(new Callback<Boolean>() {
                             @Override
-                            public void onResponse(Call<String> call, Response<String> response) {
+                            public void onResponse(Call<Boolean> call, Response<Boolean> response) {
                                 Toast toast;
-                                if (response.body().equals("changed")) {
+                                if (response.body() != null && response.body()) {
                                     toast = Toast.makeText(getActivity(), "Password changed successfully", Toast.LENGTH_LONG);
                                 } else {
                                     toast = Toast.makeText(getActivity(), "Password not changed", Toast.LENGTH_LONG);
@@ -343,8 +404,10 @@ public class FragmentProfile extends Fragment {
                             }
 
                             @Override
-                            public void onFailure(Call<String> call, Throwable t) {
-
+                            public void onFailure(Call<Boolean> call, Throwable t) {
+                                Toast toast = Toast.makeText(getActivity(), "Password not changed.\nError connection", Toast.LENGTH_LONG);
+                                toast.setGravity(Gravity.BOTTOM, 0, TOAST_Y_GRAVITY);
+                                toast.show();
                             }
                         });
                     }

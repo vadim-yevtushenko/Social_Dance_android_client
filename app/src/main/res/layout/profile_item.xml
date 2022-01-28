@@ -75,18 +75,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvDateShow" />
 
-    <EditText
-        android:id="@+id/etEmail"
+    <TextView
+        android:id="@+id/tvEmail"
+        android:gravity="center"
         android:layout_width="170dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="16dp"
-        android:ems="10"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
-        android:textSize="10sp"
+        android:layout_height="20dp"
+        android:layout_marginTop="24dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.941"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_bias="0.542"
+        app:layout_constraintStart_toEndOf="@+id/etPhone"
         app:layout_constraintTop_toBottomOf="@+id/etCity" />
 
     <EditText
@@ -97,7 +94,7 @@
         android:ems="10"
         android:hint="Phone"
         android:inputType="phone"
-        android:textSize="10sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.066"
         app:layout_constraintStart_toStartOf="parent"
@@ -343,7 +340,7 @@
         android:textColor="#305AED"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.227"
+        app:layout_constraintHorizontal_bias="0.28"
         app:layout_constraintStart_toEndOf="@+id/textView33"
         app:layout_constraintTop_toBottomOf="@+id/cbTango" />
 

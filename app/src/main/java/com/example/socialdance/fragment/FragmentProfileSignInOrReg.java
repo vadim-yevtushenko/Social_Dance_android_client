@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -167,7 +166,7 @@ public class FragmentProfileSignInOrReg extends Fragment {
     }
 
     private void initViews(View view) {
-        etEmail = view.findViewById(R.id.etEmail);
+        etEmail = view.findViewById(R.id.tvEmail);
         etPassword = view.findViewById(R.id.etPassword);
         etEmailReg = view.findViewById(R.id.etEmailReg);
         etPasswordReg = view.findViewById(R.id.etPasswordReg);

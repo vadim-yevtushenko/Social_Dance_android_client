@@ -7,6 +7,9 @@
         android:title="Settings">
         <menu>
             <item
+                android:id="@+id/itemChangeEmail"
+                android:title="Change email" />
+            <item
                 android:id="@+id/itemChangePassword"
                 android:title="Change password" />
         </menu>
